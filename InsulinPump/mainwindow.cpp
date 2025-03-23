@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
-    connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
+    //connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
 
     connect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
 
@@ -33,13 +33,13 @@ void MainWindow::onStartClicked() {
     if (simulationTimer->isActive()) {
         simulationTimer->stop();
         device->stopDevice();
-        appendLog("Simulation paused.");
-        ui->startButton->setText("Start");
+        appendLog("Power off.");
+        ui->startButton->setText("Power On");
     } else {
         device->startDevice();
         simulationTimer->start(1000); // 1 second = 1 time step
-        appendLog("Simulation started.");
-        ui->startButton->setText("Pause");
+        appendLog("Power on.");
+        ui->startButton->setText("Power Off");
     }
 }
 
@@ -55,9 +55,9 @@ void MainWindow::updateGlucose(double level) {
     ui->glucoseLabel->setText(QString("Current Glucose: %1 mmol/L").arg(level, 0, 'f', 1));
 }
 
-void MainWindow::updateIOB(double level) {
-    ui->IOB->setText(QString("IOB: %1 mmol/L").arg(level, 0, 'f', 1));
-}
+//void MainWindow::updateIOB(double level) {
+//    ui->IOB->setText(QString("IOB: %1 mmol/L").arg(level, 0, 'f', 1));
+//}
 
 void MainWindow::appendLog(const QString &msg) {
     ui->logOutput->appendPlainText(msg);
