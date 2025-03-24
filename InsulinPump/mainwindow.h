@@ -18,6 +18,7 @@ public:
 private slots:
     void onStartClicked();
     void onBolusClicked();
+    void onChargeClicked();
     void updateBattery(int level);
     void updateGlucose(double level);
     void updateIOB(double level);
@@ -27,6 +28,11 @@ private:
     Ui::MainWindow *ui;
     Device *device;
     QTimer *simulationTimer;
+
+    void connectAllSlots();
+    void disconnectAllSlots();
+    void enableAllInput();
+    void disableAllInput();
 };
 
 #endif // MAINWINDOW_H

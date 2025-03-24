@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1496</width>
-    <height>446</height>
+    <width>1336</width>
+    <height>416</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -35,7 +35,7 @@
        <height>318</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="mainLayout">
       <item>
        <layout class="QHBoxLayout" name="buttonLayout">
         <item>
@@ -121,9 +121,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="IOB">
+       <widget class="QLabel" name="IOBLabel">
         <property name="text">
-         <string>Insulin On Board (IOB): 2.5u | 3:45 hrs</string>
+         <string>Insulin On Board (IOB): 0.0u | 0:00 hrs</string>
         </property>
        </widget>
       </item>
@@ -269,7 +269,7 @@
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>310</y>
+       <y>320</y>
        <width>168</width>
        <height>27</height>
       </rect>
@@ -292,13 +292,143 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QFrame" name="bolusFrame">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>10</y>
+      <width>411</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="bolusHeaderLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>105</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Bolus:</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>321</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="bolusLabelLayout">
+      <item>
+       <widget class="QLabel" name="bolusUnitLabel">
+        <property name="text">
+         <string>Bolus Unit:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="bolusDurationLabel">
+        <property name="text">
+         <string>Duration: </string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>361</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="bolusValueLayout">
+      <item>
+       <widget class="QDoubleSpinBox" name="bolusUnitSpinBox"/>
+      </item>
+      <item>
+       <spacer name="spacer3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="bolusHourSpinBox">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>12</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="bolusHourLabel">
+        <property name="text">
+         <string>Hours</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="bolusMinuteSpinBox">
+        <property name="maximum">
+         <number>59</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="bolusMinuteLabel">
+        <property name="text">
+         <string>Minutes</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="bolusOverrideButton">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>130</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Override</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1496</width>
+     <width>1336</width>
      <height>22</height>
     </rect>
    </property>
