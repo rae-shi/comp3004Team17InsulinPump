@@ -1,14 +1,11 @@
 #include "insulinpump.h"
 #include <QDebug>
 #include <QString>
+#include <QtCore/QRandomGenerator>
 
-// TODO-1: the updateInsulin logic not connected to the mainwindow.cpp and there is no GUI component for showing insulin now
-// it should be shown at the top right corner
+// TODO-1: Fix IOB so that it decreases with time + Figure out how to connect timestep to IOB in updateInsulin() to show hours remaining
 
-//TODO-2: the battery logic also not correctly set up in the mainwindow.cpp. Also no GUI component yet. It should be shown at the
-// top left corner
-
-//TODO-3: similar issue for the insulin on board.
+// TODO-2: Fix simulateBolus() and calculateBolus () according to gui layout for user input
 
 // -------------------- Device Class --------------------
 Device::Device(QObject *parent)
@@ -104,17 +101,51 @@ double InsulinControlSystem::getInsulinOnBoard() const {
     return insulinOnBoard;
 }
 
+
 void InsulinControlSystem::updateInsulin() {
     if (currentState != Start) return;
+
     // Simulate effect of basal insulin delivery
-    insulinOnBoard += basalRate * 0.1;
+    double basalEffect = basalRate * 0.1;
+    insulinOnBoard += basalEffect;
     currentGlucose -= 0.1 * basalRate;
+
+    // Add random fluctuations to prevent stabilization
+    // Range: -0.15 to 0.15
+    double noiseFactor = QRandomGenerator::global()->generateDouble() * 0.3 - 0.15;
+    currentGlucose += noiseFactor;
+
+    // Ensure values remain stable and avoid floating-point errors
+    insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
+    currentGlucose = qRound(currentGlucose * 100) / 100.0;
+    basalEffect = qRound(basalEffect * 100) / 100.0;
+
+    // Predict glucose trend 30 minutes ahead
+    double predictedGlu = currentGlucose - (insulinOnBoard * 0.5);
+    // Small random fluctuation
+    predictedGlu += QRandomGenerator::global()->generateDouble() * 0.2 - 0.1;
+    predictedGlu = qRound(predictedGlu * 100) / 100.0;
+
+    // Adjust insulin delivery based on Control-IQ technology rules
+    if (predictedGlu <= 3.9) {
+        basalRate = 0.0;  // Suspend insulin if glucose is too low
+    } else if (predictedGlu <= 6.25) {
+        basalRate = qMax(basalRate * 0.5, 0.1);  // Reduce insulin
+    } else if (predictedGlu >= 8.9) {
+        double maxBasalRate = 2.0;
+        basalRate = qMin(basalRate * 1.2, maxBasalRate);  // Increase insulin
+    }
+    // If lowest glucose is min 4.0
     if (currentGlucose < 4.0) currentGlucose = 4.0;
 
-    emit insulinDelivered(basalRate * 0.1);
+    // Emit updated values - gui dependent - change as needed
+    emit IOBChanged(insulinOnBoard);
+    emit insulinDelivered(basalEffect);
     emit glucoseChanged(currentGlucose);
-    emit logEvent(QString("Basal insulin delivered: %1 | Glucose: %2").arg(basalRate * 0.1).arg(currentGlucose));
+    emit logEvent(QString("Basal insulin delivered: %1 | Glucose: %2 | Predicted: %3")
+                  .arg(basalEffect).arg(currentGlucose).arg(predictedGlu));
 }
+
 
 void InsulinControlSystem::simulateBolus(double glucoseLevel) {
     double bolus = calculateBolus(glucoseLevel);

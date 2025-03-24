@@ -121,7 +121,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="IOB">
         <property name="text">
          <string>Insulin On Board (IOB): 2.5u | 3:45 hrs</string>
         </property>

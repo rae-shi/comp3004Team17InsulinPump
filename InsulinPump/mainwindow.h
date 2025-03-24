@@ -20,6 +20,7 @@ private slots:
     void onBolusClicked();
     void updateBattery(int level);
     void updateGlucose(double level);
+    void updateIOB(double level);
     void appendLog(const QString &msg);
 
 private:
