@@ -56,6 +56,7 @@ public:
 signals:
     void insulinDelivered(double amount);
     void glucoseChanged(double level);
+    void cartChanged(double level);
     void IOBChanged(double amount);
     void bolusInjected(double units);
     void logEvent(const QString &event);
@@ -64,6 +65,7 @@ private:
     double basalRate;
     double currentGlucose;
     double insulinOnBoard;
+    double cartLevel;
     //Mode currentMode;
     State currentState;
 

@@ -80,7 +80,7 @@ int Device::getBatteryLevel() const {
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
-    : QObject(parent), basalRate(1.0), currentGlucose(5.5), insulinOnBoard(0.0), currentState(Stop) {}
+    : QObject(parent), basalRate(1.0), currentGlucose(5.5), insulinOnBoard(0.0), currentState(Stop), cartLevel(300.00) {}
 
 void InsulinControlSystem::setState(State state) {
     currentState = state;
@@ -103,6 +103,8 @@ double InsulinControlSystem::getInsulinOnBoard() const {
 
 
 void InsulinControlSystem::updateInsulin() {
+    // by ICS logic, each time step is a minute
+
     if (currentState != Start) return;
 
     // Simulate effect of basal insulin delivery
@@ -118,7 +120,9 @@ void InsulinControlSystem::updateInsulin() {
     // Ensure values remain stable and avoid floating-point errors
     insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
     currentGlucose = qRound(currentGlucose * 100) / 100.0;
+    cartLevel -= basalEffect;
     basalEffect = qRound(basalEffect * 100) / 100.0;
+
 
     // Predict glucose trend 30 minutes ahead
     double predictedGlu = currentGlucose - (insulinOnBoard * 0.5);
@@ -142,6 +146,7 @@ void InsulinControlSystem::updateInsulin() {
     emit IOBChanged(insulinOnBoard);
     emit insulinDelivered(basalEffect);
     emit glucoseChanged(currentGlucose);
+    emit cartChanged(cartLevel);
     emit logEvent(QString("Basal insulin delivered: %1 | Glucose: %2 | Predicted: %3")
                   .arg(basalEffect).arg(currentGlucose).arg(predictedGlu));
 }

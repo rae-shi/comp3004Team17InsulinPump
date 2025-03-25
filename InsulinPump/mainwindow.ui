@@ -83,7 +83,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QProgressBar" name="progressBar">
+         <widget class="QProgressBar" name="cartridge">
           <property name="styleSheet">
            <string notr="true">QProgressBar{ text-align:center; border: 2px solid grey; border-radius: 3px;}  QProgressBar::chunk {background-color: #89CFF0;margin: 0.5px;;}  </string>
           </property>
