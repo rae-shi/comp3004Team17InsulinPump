@@ -113,7 +113,7 @@ void MainWindow::onBolusClicked() {
 
 void MainWindow::onChargeClicked(){
     if(ui->batteryBar->value()!=100){
-        ui->batteryBar->setValue(100);
+        device->chargeBattery();
         appendLog("Battery charged to 100%.");
     }
 }
