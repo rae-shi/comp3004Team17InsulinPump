@@ -1,11 +1,4 @@
 #include "insulinpump.h"
-#include <QDebug>
-#include <QString>
-#include <QtCore/QRandomGenerator>
-
-// TODO-1: Fix IOB so that it decreases with time + Figure out how to connect timestep to IOB in updateInsulin() to show hours remaining
-
-// TODO-2: Fix simulateBolus() and calculateBolus () according to gui layout for user input
 
 // -------------------- Device Class --------------------
 Device::Device(QObject *parent)
@@ -34,6 +27,8 @@ void Device::runDevice() {
     if (!isRunning) return;
 
     timeStep++;
+    emit logEvent(QString("Time Step: %1").arg(timeStep));
+    ics->setTimeStep(timeStep);
     ics->updateInsulin();
 
     // Battery discharge rate to 1% every 3 steps
@@ -54,6 +49,7 @@ void Device::runDevice() {
 
         emit batteryLevelChanged(batteryLevel);
     }
+    emit logEvent(QString("------------------"));
 }
 
 void Device::stopDevice() {
@@ -65,7 +61,6 @@ void Device::stopDevice() {
 void Device::chargeBattery() {
     batteryLevel = 100;
     emit batteryLevelChanged(batteryLevel);
-    emit logEvent("Battery charged to 100%.");
 }
 
 void Device::depleteBattery() {
@@ -77,6 +72,7 @@ void Device::depleteBattery() {
 int Device::getBatteryLevel() const {
     return batteryLevel;
 }
+
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
@@ -97,6 +93,11 @@ void InsulinControlSystem::setCurrentGlucose(double level) {
     emit glucoseChanged(currentGlucose);
 }
 
+// for anything time related, ics has an udpated timestep
+void InsulinControlSystem:: setTimeStep(int ts){
+    timeStep = ts;
+}
+
 double InsulinControlSystem::getInsulinOnBoard() const {
     return insulinOnBoard;
 }
@@ -104,7 +105,6 @@ double InsulinControlSystem::getInsulinOnBoard() const {
 
 void InsulinControlSystem::updateInsulin() {
     // by ICS logic, each time step is a minute
-
     if (currentState != Start) return;
 
     // Simulate effect of basal insulin delivery
@@ -117,11 +117,21 @@ void InsulinControlSystem::updateInsulin() {
     double noiseFactor = QRandomGenerator::global()->generateDouble() * 0.3 - 0.15;
     currentGlucose += noiseFactor;
 
+
     // Ensure values remain stable and avoid floating-point errors
     insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
     currentGlucose = qRound(currentGlucose * 100) / 100.0;
     cartLevel -= basalEffect;
     basalEffect = qRound(basalEffect * 100) / 100.0;
+
+    // insulin is absorbed 2% per minute
+    insulinOnBoard *= 0.98;
+
+    // calculate hours remaining for IOB
+    double remainingTimeMinutes = log(100 / insulinOnBoard) / log(1.02); // Using a decay formula
+    double remainingTimeHours = remainingTimeMinutes / 60.0;  // Convert minutes to hours
+
+
 
 
     // Predict glucose trend 30 minutes ahead
@@ -143,14 +153,13 @@ void InsulinControlSystem::updateInsulin() {
     if (currentGlucose < 4.0) currentGlucose = 4.0;
 
     // Emit updated values - gui dependent - change as needed
-    emit IOBChanged(insulinOnBoard);
+    emit IOBChanged(insulinOnBoard, remainingTimeHours);
     emit insulinDelivered(basalEffect);
     emit glucoseChanged(currentGlucose);
     emit cartChanged(cartLevel);
     emit logEvent(QString("Basal insulin delivered: %1 | Glucose: %2 | Predicted: %3")
                   .arg(basalEffect).arg(currentGlucose).arg(predictedGlu));
 }
-
 
 void InsulinControlSystem::simulateBolus(double glucoseLevel) {
     double bolus = calculateBolus(glucoseLevel);

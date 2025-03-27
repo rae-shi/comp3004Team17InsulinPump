@@ -22,7 +22,7 @@ private slots:
     void updateBattery(int level);
     void updateCart(double level);
     void updateGlucose(double level);
-    void updateIOB(double level);
+    void updateIOB(double level, double hours);
     void appendLog(const QString &msg);
 
 private:

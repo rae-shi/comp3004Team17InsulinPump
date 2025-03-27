@@ -133,8 +133,10 @@ void MainWindow::updateGlucose(double level) {
     ui->glucoseLabel->setText(QString("Current Glucose: %1 mmol/L").arg(level, 0, 'f', 1));
 }
 
-void MainWindow::updateIOB(double level) {
-    ui->IOBLabel->setText(QString("Insulin On Board (IOB): %1u | time hrs").arg(level, 0, 'f', 1));
+void MainWindow::updateIOB(double level, double hours) {
+    ui->IOBLabel->setText(QString("Insulin On Board (IOB): %1 u | %2 hrs")
+                           .arg(level, 0, 'f', 2)
+                           .arg(hours, 0, 'f', 2));
 }
 
 void MainWindow::appendLog(const QString &msg) {

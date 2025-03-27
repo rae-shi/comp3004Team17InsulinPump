@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QDebug>
+#include <QString>
+#include <QtCore/QRandomGenerator>
 
 // -------------------- Device Class --------------------
 class Device : public QObject {
@@ -50,18 +53,19 @@ public:
     void setBasalRate(double rate);
     void setCurrentGlucose(double level);
     void simulateBolus(double glucoseLevel);
-
     double getInsulinOnBoard() const;
+    void setTimeStep(int ts);
 
 signals:
     void insulinDelivered(double amount);
     void glucoseChanged(double level);
     void cartChanged(double level);
-    void IOBChanged(double amount);
+    void IOBChanged(double amount, double hours);
     void bolusInjected(double units);
     void logEvent(const QString &event);
 
 private:
+    int timeStep;
     double basalRate;
     double currentGlucose;
     double insulinOnBoard;
