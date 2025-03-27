@@ -27,6 +27,7 @@ void MainWindow::connectAllSlots(){
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
     connect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
     connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
+    connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
 
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -40,6 +41,8 @@ void MainWindow::connectAllSlots(){
 void MainWindow::disconnectAllSlots(){
     disconnect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
     disconnect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
+    disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
+    disconnect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -114,8 +117,12 @@ void MainWindow::onBolusClicked() {
 void MainWindow::onChargeClicked(){
     if(ui->batteryBar->value()!=100){
         device->chargeBattery();
-        appendLog("Battery charged to 100%.");
     }
+}
+
+void MainWindow::onDisconnectClicked(){
+    appendLog("!!Device Disconnected!! \n * Please reconnect and power the system back on.");
+    onStartClicked();
 }
 
 void MainWindow::updateBattery(int level) {

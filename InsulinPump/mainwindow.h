@@ -19,6 +19,7 @@ private slots:
     void onStartClicked();
     void onBolusClicked();
     void onChargeClicked();
+    void onDisconnectClicked();
     void updateBattery(int level);
     void updateCart(double level);
     void updateGlucose(double level);
