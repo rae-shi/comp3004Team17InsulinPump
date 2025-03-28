@@ -128,6 +128,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pauseIns">
+        <property name="text">
+         <string>Pause Insulin</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPlainTextEdit" name="logOutput">
         <property name="styleSheet">
          <string notr="true"/>

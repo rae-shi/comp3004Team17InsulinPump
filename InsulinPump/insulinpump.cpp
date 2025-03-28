@@ -14,14 +14,14 @@ void Device::setupDevice() {
     emit logEvent(QString("------------------"));
     ics->setBasalRate(1.0);
     ics->setCurrentGlucose(5.5); // mmol/L baseline
-    ics->setState(InsulinControlSystem::Start);
+    ics->setState(InsulinControlSystem::Run);
     emit logEvent("Device setup complete.");
 }
 
 void Device::startDevice() {
     emit logEvent(QString("------------------"));
     isRunning = true;
-    ics->setState(InsulinControlSystem::Start);
+    ics->setState(InsulinControlSystem::Run);
     emit logEvent("Device started.");
 }
 
@@ -89,7 +89,7 @@ int Device::getBatteryLevel() const {
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
-    : QObject(parent), basalRate(1.0), correctionFactor(1.0), carbRatio(1), targetGlucose(5.0), currentGlucose(5.5), insulinOnBoard(0.0), currentState(Stop), cartLevel(300.00) {}
+    : QObject(parent), basalRate(1.0), correctionFactor(1.0), carbRatio(1), targetGlucose(5.0), currentGlucose(5.5), insulinOnBoard(0.0), cartLevel(300.00), currentState(Run){}
 
 void InsulinControlSystem::setState(State state) {
     currentState = state;
@@ -133,7 +133,14 @@ double InsulinControlSystem::getInsulinOnBoard() const {
 
 void InsulinControlSystem::updateInsulin() {
     // by ICS logic, each time step is a minute
-    if (currentState != Start) return;
+    if (currentState == Stop) return;
+    if (currentState == Pause){
+        setBasalRate(0);
+    } else if (currentState == Resume){
+        currentState = Run;
+        setBasalRate(1.0);
+    }
+
 
     // Simulate effect of basal insulin delivery
     double basalEffect = basalRate * 0.1;
@@ -167,15 +174,20 @@ void InsulinControlSystem::updateInsulin() {
 
     // Adjust insulin delivery based on Control-IQ technology rules
     if (predictedGlu <= 3.9) {
+        emit logEvent("User is hypoglycemic");
         basalRate = 0.0;  // Suspend insulin if glucose is too low
     } else if (predictedGlu <= 6.25) {
         basalRate = qMax(basalRate * 0.5, 0.1);  // Reduce insulin
     } else if (predictedGlu >= 8.9) {
+        emit logEvent("User is hyperglycemic");
         double maxBasalRate = 2.0;
         basalRate = qMin(basalRate * 1.2, maxBasalRate);  // Increase insulin
     }
     // If lowest glucose is min 4.0
-    if (currentGlucose < 4.0) currentGlucose = 4.0;
+    if (currentState == Run){
+        if (currentGlucose < 4.0) currentGlucose = 4.0;
+    }
+
 
     // Emit updated values - gui dependent - change as needed
     emit IOBChanged(insulinOnBoard, remainingTimeHours);

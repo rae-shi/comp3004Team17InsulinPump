@@ -46,7 +46,7 @@ class InsulinControlSystem : public QObject {
 
 public:
     //enum Mode { Normal, Morning, Sleep, Exercise };
-    enum State { Start, Stop, Resume };
+    enum State { Run, Stop, Pause, Resume };
 
     explicit InsulinControlSystem(QObject *parent = nullptr);
 

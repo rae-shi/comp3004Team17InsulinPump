@@ -40,6 +40,7 @@ void MainWindow::connectAllSlots(){
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::cartChanged, this, &MainWindow::updateCart);
+    connect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
 
     connect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
 }
@@ -51,6 +52,7 @@ void MainWindow::disconnectAllSlots(){
     disconnect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
     disconnect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     disconnect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
+    disconnect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -121,6 +123,22 @@ void MainWindow::onStartClicked() {
         enableAllInput();
         ui->startButton->setText("Power Off");
     }
+}
+
+void MainWindow::onPauseInClicked() {
+
+    if (ui->pauseIns->text() == "Pause Insulin"){
+        appendLog("Insulin delivery paused.");
+        device->findChild<InsulinControlSystem*>()->setState(InsulinControlSystem::Pause);
+        ui->pauseIns->setEnabled(true);
+        ui->pauseIns->setText("Resume Insulin");
+    } else if (ui->pauseIns->text() == "Resume Insulin"){
+        appendLog("Insulin delivery resumed.");
+        device->findChild<InsulinControlSystem*>()->setState(InsulinControlSystem::Resume);
+        ui->pauseIns->setEnabled(true);
+        ui->pauseIns->setText("Pause Insulin");
+    }
+
 }
 
 void MainWindow::onBolusClicked() {

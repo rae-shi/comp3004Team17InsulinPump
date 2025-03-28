@@ -19,6 +19,7 @@ private slots:
     void onStartClicked();
     void onBolusClicked();
     void onChargeClicked();
+    void onPauseInClicked();
     void onDisconnectClicked();
     void onSubmitProfileClicked();
     void onEditProfileClicked();
