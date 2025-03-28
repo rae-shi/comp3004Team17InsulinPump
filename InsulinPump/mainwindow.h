@@ -20,11 +20,17 @@ private slots:
     void onBolusClicked();
     void onChargeClicked();
     void onDisconnectClicked();
+    void onSubmitProfileClicked();
+    void onEditProfileClicked();
     void updateBattery(int level);
     void updateCart(double level);
     void updateGlucose(double level);
     void updateIOB(double level, double hours);
     void appendLog(const QString &msg);
+
+signals:
+    void profileUpdated(double basalRate, double correctionFactor, int carbRatio, double targetGlucose);
+
 
 private:
     Ui::MainWindow *ui;

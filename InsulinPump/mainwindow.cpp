@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->chargeButton->setEnabled(true);
 
     device->setupDevice();
+    appendLog(QString("------------------"));
+    appendLog("Profile defaulted to Morning.");
+    emit profileUpdated(ui->morningBRSpinBox->value(), ui->morningCFSpinBox->value(), ui->morningCRSpinBox->value(), ui->morningBGSpinBox->value());
 }
 
 MainWindow::~MainWindow() {
@@ -28,9 +31,12 @@ void MainWindow::connectAllSlots(){
     connect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
     connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
+    connect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
+    connect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
 
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
+    connect(this, &MainWindow::profileUpdated, device, &Device::applyProfile);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::cartChanged, this, &MainWindow::updateCart);
@@ -43,9 +49,12 @@ void MainWindow::disconnectAllSlots(){
     disconnect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
     disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     disconnect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
+    disconnect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
+    disconnect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
+    disconnect(this, &MainWindow::profileUpdated, device, &Device::applyProfile);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
 
@@ -56,40 +65,44 @@ void MainWindow::enableAllInput(){
     //buttons
     ui->bolusButton->setEnabled(true);
     ui->chargeButton->setEnabled(true);
-    ui->createProfileButton->setEnabled(true);
-    ui->defaultProfileRadioButton->setEnabled(true);
-    ui->deleteProfileButton->setEnabled(true);
     ui->disconnectButton->setEnabled(true);
     ui->startButton->setEnabled(true);
+    ui->editProfileButton->setEnabled(true);
     ui->submitProfileButton->setEnabled(true);
     ui->bolusOverrideButton->setEnabled(true);
+
+    //radio buttons
+    ui->morningProfileRadioButton->setEnabled(true);
+    ui->afternoonProfileRadioButton->setEnabled(true);
+    ui->nightProfileRadioButton->setEnabled(true);
 
     //spin boxes
     ui->bolusHourSpinBox->setEnabled(true);
     ui->bolusMinuteSpinBox->setEnabled(true);
     ui->bolusUnitSpinBox->setEnabled(true);
-    ui->deafultProfileGlucoseSpinBox->setEnabled(true);
-    ui->defaultProfileBasalSpinBox->setEnabled(true);
+    //leaving personal profile spin boxes out because counterproductive
 }
 
 void MainWindow::disableAllInput(){
     //buttons
     ui->bolusButton->setEnabled(false);
     ui->chargeButton->setEnabled(false);
-    ui->createProfileButton->setEnabled(false);
-    ui->defaultProfileRadioButton->setEnabled(false);
-    ui->deleteProfileButton->setEnabled(false);
     ui->disconnectButton->setEnabled(false);
     ui->startButton->setEnabled(false);
+    ui->editProfileButton->setEnabled(false);
     ui->submitProfileButton->setEnabled(false);
     ui->bolusOverrideButton->setEnabled(false);
+
+    //radio buttons
+    ui->morningProfileRadioButton->setEnabled(false);
+    ui->afternoonProfileRadioButton->setEnabled(false);
+    ui->nightProfileRadioButton->setEnabled(false);
 
     //spin boxes
     ui->bolusHourSpinBox->setEnabled(false);
     ui->bolusMinuteSpinBox->setEnabled(false);
     ui->bolusUnitSpinBox->setEnabled(false);
-    ui->deafultProfileGlucoseSpinBox->setEnabled(false);
-    ui->defaultProfileBasalSpinBox->setEnabled(false);
+    //leaving personal profile spin boxes out because counterproductive
 }
 
 void MainWindow::onStartClicked() {
@@ -121,8 +134,54 @@ void MainWindow::onChargeClicked(){
 }
 
 void MainWindow::onDisconnectClicked(){
-    appendLog("!!Device Disconnected!! \n * Please reconnect and power the system back on.");
+    appendLog(QString("------------------"));
+    appendLog("!! Device Disconnected from Person !!\nPlease reconnect and power the system back on.");
     onStartClicked();
+}
+
+void MainWindow::onSubmitProfileClicked(){
+    appendLog(QString("------------------"));
+    if(ui->morningProfileRadioButton->isChecked()){
+        appendLog("Profile set to Morning.");
+        ui->morningBRSpinBox->setEnabled(false);
+        ui->morningCFSpinBox->setEnabled(false);
+        ui->morningCRSpinBox->setEnabled(false);
+        ui->morningBGSpinBox->setEnabled(false);
+        emit profileUpdated(ui->morningBRSpinBox->value(), ui->morningCFSpinBox->value(), ui->morningCRSpinBox->value(), ui->morningBGSpinBox->value());
+    }else if(ui->afternoonProfileRadioButton->isChecked()){
+        appendLog("Profile set to Afternoon.");
+        ui->afternoonBRSpinBox->setEnabled(false);
+        ui->afternoonCFSpinBox->setEnabled(false);
+        ui->afternoonCRSpinBox->setEnabled(false);
+        ui->afternoonBGSpinBox->setEnabled(false);
+        emit profileUpdated(ui->afternoonBRSpinBox->value(), ui->afternoonCFSpinBox->value(), ui->afternoonCRSpinBox->value(), ui->afternoonBGSpinBox->value());
+    }else{
+        appendLog("Profile set to Night.");
+        ui->nightBRSpinBox->setEnabled(false);
+        ui->nightCFSpinBox->setEnabled(false);
+        ui->nightCRSpinBox->setEnabled(false);
+        ui->nightBGSpinBox->setEnabled(false);
+        emit profileUpdated(ui->nightBRSpinBox->value(), ui->nightCFSpinBox->value(), ui->nightCRSpinBox->value(), ui->nightBGSpinBox->value());
+    }
+}
+
+void MainWindow::onEditProfileClicked(){
+    if(ui->morningProfileRadioButton->isChecked()){
+        ui->morningBRSpinBox->setEnabled(true);
+        ui->morningCFSpinBox->setEnabled(true);
+        ui->morningCRSpinBox->setEnabled(true);
+        ui->morningBGSpinBox->setEnabled(true);
+    }else if(ui->afternoonProfileRadioButton->isChecked()){
+        ui->afternoonBRSpinBox->setEnabled(true);
+        ui->afternoonCFSpinBox->setEnabled(true);
+        ui->afternoonCRSpinBox->setEnabled(true);
+        ui->afternoonBGSpinBox->setEnabled(true);
+    }else{
+        ui->nightBRSpinBox->setEnabled(true);
+        ui->nightCFSpinBox->setEnabled(true);
+        ui->nightCRSpinBox->setEnabled(true);
+        ui->nightBGSpinBox->setEnabled(true);
+    }
 }
 
 void MainWindow::updateBattery(int level) {

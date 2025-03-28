@@ -11,6 +11,7 @@ Device::Device(QObject *parent)
 }
 
 void Device::setupDevice() {
+    emit logEvent(QString("------------------"));
     ics->setBasalRate(1.0);
     ics->setCurrentGlucose(5.5); // mmol/L baseline
     ics->setState(InsulinControlSystem::Start);
@@ -18,6 +19,7 @@ void Device::setupDevice() {
 }
 
 void Device::startDevice() {
+    emit logEvent(QString("------------------"));
     isRunning = true;
     ics->setState(InsulinControlSystem::Start);
     emit logEvent("Device started.");
@@ -25,6 +27,7 @@ void Device::startDevice() {
 
 void Device::runDevice() {
     if (!isRunning) return;
+    emit logEvent(QString("------------------"));
 
     timeStep++;
     emit logEvent(QString("Time Step: %1").arg(timeStep));
@@ -49,18 +52,28 @@ void Device::runDevice() {
 
         emit batteryLevelChanged(batteryLevel);
     }
-    emit logEvent(QString("------------------"));
+}
+
+void Device::applyProfile(double basalRate, double correctionFactor, int carbRatio, double targetGlucose) {
+    if (ics) {
+        ics->setBasalRate(basalRate);
+        ics->setCorrectionFactor(correctionFactor);
+        ics->setCarbRatio(carbRatio);
+        ics->setTargetGlucose(targetGlucose);
+    }
 }
 
 void Device::stopDevice() {
     isRunning = false;
     ics->setState(InsulinControlSystem::Stop);
+    emit logEvent(QString("------------------"));
     emit logEvent("Device stopped.");
 }
 
 void Device::chargeBattery() {
     batteryLevel = 100;
     emit batteryLevelChanged(batteryLevel);
+    emit logEvent("Battery charged to 100%.");
 }
 
 void Device::depleteBattery() {
@@ -76,7 +89,7 @@ int Device::getBatteryLevel() const {
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
-    : QObject(parent), basalRate(1.0), currentGlucose(5.5), insulinOnBoard(0.0), currentState(Stop), cartLevel(300.00) {}
+    : QObject(parent), basalRate(1.0), correctionFactor(1.0), carbRatio(1), targetGlucose(5.0), currentGlucose(5.5), insulinOnBoard(0.0), currentState(Stop), cartLevel(300.00) {}
 
 void InsulinControlSystem::setState(State state) {
     currentState = state;
@@ -86,6 +99,21 @@ void InsulinControlSystem::setState(State state) {
 void InsulinControlSystem::setBasalRate(double rate) {
     basalRate = rate;
     emit logEvent(QString("Basal rate set to %1").arg(rate));
+}
+
+void InsulinControlSystem::setCorrectionFactor(double factor){
+    correctionFactor = factor;
+    emit logEvent(QString("Correction Factor set to %1").arg(factor));
+}
+
+void InsulinControlSystem::setCarbRatio(int carb){
+    carbRatio = carb;
+    emit logEvent(QString("Carb Ratio set to %1").arg(carb));
+}
+
+void InsulinControlSystem::setTargetGlucose(double level){
+    targetGlucose = level;
+    emit logEvent(QString("Target Glucose set to %1").arg(level));
 }
 
 void InsulinControlSystem::setCurrentGlucose(double level) {
@@ -131,9 +159,6 @@ void InsulinControlSystem::updateInsulin() {
     double remainingTimeMinutes = log(100 / insulinOnBoard) / log(1.02); // Using a decay formula
     double remainingTimeHours = remainingTimeMinutes / 60.0;  // Convert minutes to hours
 
-
-
-
     // Predict glucose trend 30 minutes ahead
     double predictedGlu = currentGlucose - (insulinOnBoard * 0.5);
     // Small random fluctuation
@@ -173,7 +198,7 @@ void InsulinControlSystem::simulateBolus(double glucoseLevel) {
 }
 
 double InsulinControlSystem::calculateBolus(double glucose) {
-    return (glucose > 7.0 ? (glucose - 7.0) * 0.5 : 0);
+    return (glucose > targetGlucose ? (glucose - targetGlucose)/correctionFactor : 0); //calculate bolus based off of correction factor and target glucose
 }
 
 // -------------------- Logger --------------------

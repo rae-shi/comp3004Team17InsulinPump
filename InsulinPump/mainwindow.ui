@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1336</width>
-    <height>416</height>
+    <width>1488</width>
+    <height>433</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -145,8 +145,8 @@
      <rect>
       <x>500</x>
       <y>10</y>
-      <width>401</width>
-      <height>361</height>
+      <width>541</width>
+      <height>231</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -160,142 +160,518 @@
       <rect>
        <x>11</x>
        <y>11</y>
-       <width>105</width>
+       <width>141</width>
        <height>17</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Personal Profile:</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="createProfileButton">
+    <widget class="QRadioButton" name="morningProfileRadioButton">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>10</y>
-       <width>84</width>
+       <x>12</x>
+       <y>62</y>
+       <width>78</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Morning</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="afternoonProfileRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>102</y>
+       <width>89</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Afternoon</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="nightProfileRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>142</y>
+       <width>60</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Night</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>100</y>
+       <width>429</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="afternoonProfileLayout">
+      <item>
+       <widget class="QDoubleSpinBox" name="afternoonBRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <double>1.547000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="afternoonBRUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>u/1hr</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="afternoonCFSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>2.500000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="afternoonCFUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>1u:mmol/L</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="afternoonCRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <double>12.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="afternoonCRUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>1u:g</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="afternoonBGSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>5.800000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="afternoonBGUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>mmol/L</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>140</y>
+       <width>429</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="nightProfileLayout">
+      <item>
+       <widget class="QDoubleSpinBox" name="nightBRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <double>0.879000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="afternoonBRUnitLabel_2">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>u/1hr</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="nightCFSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>2.400000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="nightCFUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>1u:mmol/L</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="nightCRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <double>15.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="nightCRUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>1u:g</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="nightBGSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>5.300000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="nightBGUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>mmol/L</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="submitProfileButton">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>200</y>
+       <width>80</width>
        <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>Create New</string>
+      <string>Submit</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>371</width>
-       <height>31</height>
+       <x>100</x>
+       <y>60</y>
+       <width>431</width>
+       <height>28</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="defaultProfileLayout">
+     <layout class="QHBoxLayout" name="morningProfileLayout">
       <item>
-       <widget class="QRadioButton" name="defaultProfileRadioButton">
-        <property name="text">
-         <string>   Regular</string>
+       <widget class="QDoubleSpinBox" name="morningBRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <double>1.215000000000000</double>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="spacer1">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QLabel" name="morningBRUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>u/1hr</string>
         </property>
-       </spacer>
+       </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="defaultProfileBasalSpinBox"/>
+       <widget class="QDoubleSpinBox" name="morningCFSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>2.800000000000000</double>
+        </property>
+       </widget>
       </item>
       <item>
-       <spacer name="spacer2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QLabel" name="morningCFUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>1u:mmol/L</string>
         </property>
-       </spacer>
+       </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="deafultProfileGlucoseSpinBox"/>
+       <widget class="QDoubleSpinBox" name="morningCRSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="morningCRUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>1u:g</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="morningBGSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <double>5.500000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="morningBGUnitLabel">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>mmol/L</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QPushButton" name="editProfileButton">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>50</y>
-       <width>361</width>
-       <height>22</height>
+       <x>360</x>
+       <y>200</y>
+       <width>83</width>
+       <height>25</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="profileLabelLayout">
-      <item>
-       <widget class="QLabel" name="profileLabel">
-        <property name="text">
-         <string>Profile:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="basalLabel">
-        <property name="text">
-         <string>Basal Rate:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="targetGlucoseLabel">
-        <property name="text">
-         <string>Target Glucose:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="text">
+      <string>Edit</string>
+     </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QLabel" name="BRLabel">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>320</y>
-       <width>168</width>
-       <height>27</height>
+       <x>100</x>
+       <y>30</y>
+       <width>91</width>
+       <height>17</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="ProfileButtonLayout">
-      <item>
-       <widget class="QPushButton" name="deleteProfileButton">
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="submitProfileButton">
-        <property name="text">
-         <string>Submit</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Basal Rate:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="CFLabel">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>30</y>
+       <width>101</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Correction Factor:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="CRLabel">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>30</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Carb Ratio:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>30</y>
+       <width>101</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Blood Glucose:</string>
+     </property>
     </widget>
    </widget>
    <widget class="QFrame" name="bolusFrame">
     <property name="geometry">
      <rect>
-      <x>910</x>
+      <x>1070</x>
       <y>10</y>
       <width>411</width>
       <height>161</height>
@@ -428,7 +804,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1336</width>
+     <width>1488</width>
      <height>22</height>
     </rect>
    </property>

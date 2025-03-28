@@ -23,6 +23,9 @@ public:
 
     int getBatteryLevel() const;
 
+public slots:
+    void applyProfile(double basalRate, double correctionFactor, int carbRatio, double targetGlucose);
+
 signals:
     void batteryLevelChanged(int level);
     void insulinInjected(double amount);
@@ -51,6 +54,9 @@ public:
     void setState(State state);
     //void setMode(Mode mode);
     void setBasalRate(double rate);
+    void setCorrectionFactor(double factor);
+    void setCarbRatio(int carb);
+    void setTargetGlucose(double level);
     void setCurrentGlucose(double level);
     void simulateBolus(double glucoseLevel);
     double getInsulinOnBoard() const;
@@ -67,6 +73,9 @@ signals:
 private:
     int timeStep;
     double basalRate;
+    double correctionFactor;
+    int carbRatio;
+    double targetGlucose;
     double currentGlucose;
     double insulinOnBoard;
     double cartLevel;
