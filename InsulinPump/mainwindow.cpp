@@ -25,6 +25,8 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+//helper functions
+
 void MainWindow::connectAllSlots(){
     // Connections
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
@@ -111,6 +113,8 @@ void MainWindow::disableAllInput(){
     //leaving personal profile spin boxes out because counterproductive
 }
 
+//slots
+
 void MainWindow::onStartClicked() {
     if (simulationTimer->isActive()) {
         simulationTimer->stop();
@@ -162,6 +166,9 @@ void MainWindow::onDisconnectClicked(){
 
 void MainWindow::onSubmitProfileClicked(){
     appendLog(QString("------------------"));
+    ui->morningProfileRadioButton->setEnabled(true);
+    ui->afternoonProfileRadioButton->setEnabled(true);
+    ui->nightProfileRadioButton->setEnabled(true);
     if(ui->morningProfileRadioButton->isChecked()){
         appendLog("Profile set to Morning.");
         ui->morningBRSpinBox->setEnabled(false);
@@ -187,6 +194,9 @@ void MainWindow::onSubmitProfileClicked(){
 }
 
 void MainWindow::onEditProfileClicked(){
+    ui->morningProfileRadioButton->setEnabled(false);
+    ui->afternoonProfileRadioButton->setEnabled(false);
+    ui->nightProfileRadioButton->setEnabled(false);
     if(ui->morningProfileRadioButton->isChecked()){
         ui->morningBRSpinBox->setEnabled(true);
         ui->morningCFSpinBox->setEnabled(true);

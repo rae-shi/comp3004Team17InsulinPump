@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1488</width>
-    <height>470</height>
+    <width>1077</width>
+    <height>423</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -146,7 +146,7 @@
       <x>500</x>
       <y>10</y>
       <width>541</width>
-      <height>231</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -167,6 +167,7 @@
      <property name="font">
       <font>
        <family>DejaVu Sans</family>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -286,6 +287,9 @@
         <property name="decimals">
          <number>0</number>
         </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
         <property name="value">
          <double>12.000000000000000</double>
         </property>
@@ -311,6 +315,12 @@
         </property>
         <property name="decimals">
          <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>3.900000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
         </property>
         <property name="value">
          <double>5.800000000000000</double>
@@ -402,6 +412,9 @@
         <property name="decimals">
          <number>0</number>
         </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
         <property name="value">
          <double>15.000000000000000</double>
         </property>
@@ -428,6 +441,12 @@
         <property name="decimals">
          <number>1</number>
         </property>
+        <property name="minimum">
+         <double>3.900000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
         <property name="value">
          <double>5.300000000000000</double>
         </property>
@@ -452,7 +471,7 @@
      <property name="geometry">
       <rect>
        <x>450</x>
-       <y>200</y>
+       <y>180</y>
        <width>80</width>
        <height>25</height>
       </rect>
@@ -531,6 +550,9 @@
         <property name="decimals">
          <number>0</number>
         </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
         <property name="value">
          <double>10.000000000000000</double>
         </property>
@@ -557,6 +579,12 @@
         <property name="decimals">
          <number>1</number>
         </property>
+        <property name="minimum">
+         <double>3.900000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
         <property name="value">
          <double>5.500000000000000</double>
         </property>
@@ -581,7 +609,7 @@
      <property name="geometry">
       <rect>
        <x>360</x>
-       <y>200</y>
+       <y>180</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -612,7 +640,7 @@
     <widget class="QLabel" name="CFLabel">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>30</y>
        <width>101</width>
        <height>17</height>
@@ -631,7 +659,7 @@
     <widget class="QLabel" name="CRLabel">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>340</x>
        <y>30</y>
        <width>91</width>
        <height>17</height>
@@ -650,7 +678,7 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>420</x>
+       <x>440</x>
        <y>30</y>
        <width>101</width>
        <height>17</height>
@@ -670,10 +698,10 @@
    <widget class="QFrame" name="bolusFrame">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>250</y>
-      <width>491</width>
-      <height>161</height>
+      <x>500</x>
+      <y>230</y>
+      <width>541</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -687,183 +715,190 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>105</width>
+       <width>151</width>
        <height>17</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Bolus Claculator:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="carbsLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>58</width>
-       <height>16</height>
-      </rect>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
-      <string>Carbs:</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="carbsInputSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>40</y>
-       <width>42</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="glucoseLabel_2">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>40</y>
-       <width>58</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Glucose:</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="glucoseInputSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>40</y>
-       <width>42</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="deliverNowLabel">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>10</y>
-       <width>81</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Delivery Now</string>
+      <string>Bolus Calculator:</string>
      </property>
     </widget>
     <widget class="QPushButton" name="viewCalcButton">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>130</y>
+       <x>410</x>
+       <y>100</y>
        <width>121</width>
-       <height>32</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>View Calculation</string>
      </property>
     </widget>
-    <widget class="QLabel" name="deliveryLaterLabel">
-     <property name="geometry">
-      <rect>
-       <x>370</x>
-       <y>10</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Delivery Later</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="deliveryNowPerLabel">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>40</y>
-       <width>58</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>60%</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="deliveryLaterPerLabel">
-     <property name="geometry">
-      <rect>
-       <x>370</x>
-       <y>40</y>
-       <width>58</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>40%</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="extendedDurationLabel">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>60</y>
-       <width>111</width>
+       <x>10</x>
+       <y>80</y>
+       <width>131</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Extended Duration</string>
+      <string>Extended Duration:</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="extendedDurationHourSpinBox">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>80</y>
-       <width>42</width>
-       <height>22</height>
+       <x>10</x>
+       <y>40</y>
+       <width>270</width>
+       <height>28</height>
       </rect>
      </property>
+     <layout class="QHBoxLayout" name="bolusInputLayout">
+      <item>
+       <widget class="QLabel" name="carbsLabel">
+        <property name="text">
+         <string>Carbs:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="carbsInputSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="morningCRUnitLabel_2">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>g</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="glucoseLabel_2">
+        <property name="text">
+         <string>Glucose:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="glucoseInputSpinBox">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>3.900000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="morningCRUnitLabel_3">
+        <property name="font">
+         <font>
+          <family>DejaVu Sans</family>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>mmol/L</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
-    <widget class="QLabel" name="extendedDurationHourLabel">
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>150</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="bolusDurationLayout">
+      <item>
+       <widget class="QSpinBox" name="extendedDurationHourSpinBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="extendedDurationHourLabel">
+        <property name="text">
+         <string>hr</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="extendedDurationMinSpinBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="extendedDurationMinLabel">
+        <property name="text">
+         <string>min</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>320</x>
-       <y>80</y>
-       <width>21</width>
-       <height>16</height>
+       <y>40</y>
+       <width>211</width>
+       <height>42</height>
       </rect>
      </property>
-     <property name="text">
-      <string>h</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="extendedDurationMinSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>340</x>
-       <y>80</y>
-       <width>42</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="extendedDurationMinLabel">
-     <property name="geometry">
-      <rect>
-       <x>390</x>
-       <y>80</y>
-       <width>21</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>m</string>
-     </property>
+     <layout class="QGridLayout" name="bolusDeliveryLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="deliverNowLabel">
+        <property name="text">
+         <string>Delivery Now:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="deliveryLaterLabel">
+        <property name="text">
+         <string>Delivery Later:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="deliveryNowPerLabel">
+        <property name="text">
+         <string>60%</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="deliveryLaterPerLabel">
+        <property name="text">
+         <string>40%</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -872,8 +907,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1488</width>
-     <height>24</height>
+     <width>1077</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
