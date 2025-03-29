@@ -17,7 +17,6 @@ public:
 
 private slots:
     void onStartClicked();
-    void onBolusClicked();
     void onChargeClicked();
     void onPauseInClicked();
     void onDisconnectClicked();
@@ -43,6 +42,7 @@ private:
     void disconnectAllSlots();
     void enableAllInput();
     void disableAllInput();
+    void onCalculateBolus();
 };
 
 #endif // MAINWINDOW_H

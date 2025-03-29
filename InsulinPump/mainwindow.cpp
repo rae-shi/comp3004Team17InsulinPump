@@ -28,11 +28,11 @@ MainWindow::~MainWindow() {
 void MainWindow::connectAllSlots(){
     // Connections
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
-    connect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
     connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
     connect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     connect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
+    connect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
 
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -48,11 +48,11 @@ void MainWindow::connectAllSlots(){
 
 void MainWindow::disconnectAllSlots(){
     disconnect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
-    disconnect(ui->bolusButton, &QPushButton::clicked, this, &MainWindow::onBolusClicked);
     disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     disconnect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
     disconnect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     disconnect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
+    disconnect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
     disconnect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
@@ -67,13 +67,14 @@ void MainWindow::disconnectAllSlots(){
 
 void MainWindow::enableAllInput(){
     //buttons
-    ui->bolusButton->setEnabled(true);
     ui->chargeButton->setEnabled(true);
     ui->disconnectButton->setEnabled(true);
     ui->startButton->setEnabled(true);
     ui->editProfileButton->setEnabled(true);
     ui->submitProfileButton->setEnabled(true);
-    ui->bolusOverrideButton->setEnabled(true);
+    ui->viewCalcButton->setEnabled(true);
+    ui->extendedDurationHourSpinBox->setValue(3);
+    ui->extendedDurationMinSpinBox->setValue(0);
 
     //radio buttons
     ui->morningProfileRadioButton->setEnabled(true);
@@ -81,21 +82,21 @@ void MainWindow::enableAllInput(){
     ui->nightProfileRadioButton->setEnabled(true);
 
     //spin boxes
-    ui->bolusHourSpinBox->setEnabled(true);
-    ui->bolusMinuteSpinBox->setEnabled(true);
-    ui->bolusUnitSpinBox->setEnabled(true);
+    ui->carbsInputSpinBox->setEnabled(true);
+    ui->glucoseInputSpinBox->setEnabled(true);
+    ui->extendedDurationHourSpinBox->setEnabled(true);
+    ui->extendedDurationMinSpinBox->setEnabled(true);
     //leaving personal profile spin boxes out because counterproductive
 }
 
 void MainWindow::disableAllInput(){
     //buttons
-    ui->bolusButton->setEnabled(false);
     ui->chargeButton->setEnabled(false);
     ui->disconnectButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->editProfileButton->setEnabled(false);
     ui->submitProfileButton->setEnabled(false);
-    ui->bolusOverrideButton->setEnabled(false);
+    ui->viewCalcButton->setEnabled(false);
 
     //radio buttons
     ui->morningProfileRadioButton->setEnabled(false);
@@ -103,9 +104,10 @@ void MainWindow::disableAllInput(){
     ui->nightProfileRadioButton->setEnabled(false);
 
     //spin boxes
-    ui->bolusHourSpinBox->setEnabled(false);
-    ui->bolusMinuteSpinBox->setEnabled(false);
-    ui->bolusUnitSpinBox->setEnabled(false);
+    ui->carbsInputSpinBox->setEnabled(false);
+    ui->glucoseInputSpinBox->setEnabled(false);
+    ui->extendedDurationHourSpinBox->setEnabled(false);
+    ui->extendedDurationMinSpinBox->setEnabled(false);
     //leaving personal profile spin boxes out because counterproductive
 }
 
@@ -141,10 +143,6 @@ void MainWindow::onPauseInClicked() {
         ui->pauseIns->setText("Pause Insulin");
     }
 
-}
-
-void MainWindow::onBolusClicked() {
-    device->findChild<InsulinControlSystem*>()->simulateBolus(8.5); // Glucose level only, no carbs
 }
 
 void MainWindow::onChargeClicked(){
@@ -241,4 +239,68 @@ void MainWindow::onBatteryDepleted() {
     ui->startButton->setText("Power On");
     appendLog("System powered off due to battery depletion.");
     appendLog("Please charge the battery to power on the device.");
+}
+
+void MainWindow::onCalculateBolus() {
+    double carbInput = ui->carbsInputSpinBox->value();
+    double glucoseInput = ui->glucoseInputSpinBox->value();
+    InsulinControlSystem *ics = device->findChild<InsulinControlSystem*>();
+    if (ics) {
+        ics->setCurrentGlucose(glucoseInput);
+        appendLog(QString("Glucose set to: %1 mmol/L").arg(glucoseInput, 0, 'f', 1));
+    } else {
+        appendLog("Error: InsulinControlSystem not found.");
+    }
+
+    int bolusDurationHour = ui->extendedDurationHourSpinBox->value();
+    int bolusDurationMin = ui->extendedDurationMinSpinBox->value();
+
+    // Parameters
+    double ICR = device->findChild<InsulinControlSystem*>()->getCarbRatio();
+    double CF = device->findChild<InsulinControlSystem*>()->getCorrectionFactor();
+    double targetBG = device->findChild<InsulinControlSystem*>()->getTargetGlucose();
+    double IOB = device->findChild<InsulinControlSystem*>()->getInsulinOnBoard();
+    double bolusDuration = bolusDurationHour + (bolusDurationMin / 60.0);
+
+    // Bolus Calculation Logic
+    double carbBolus = carbInput / ICR;
+    double correctionBolus = glucoseInput > targetBG ? (glucoseInput - targetBG) / CF : 0;
+    double totalBolus = carbBolus + correctionBolus;
+    double finalBolus = totalBolus - IOB;
+    appendLog(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, totoal: %5, iob:%6 | finalBolus:%7")
+                  .arg(carbInput).arg(ICR).arg(glucoseInput).arg(targetBG).arg(totalBolus)
+                  .arg(IOB).arg(finalBolus).arg(CF));
+
+    // Immediate and Extended Bolus (60% Immediate, 40% Extended over 3 hours)
+    double immediateFraction = 0.6;
+    double immediateBolus = immediateFraction * finalBolus;
+    double extendedBolus = (1 - immediateFraction) * finalBolus;
+    double bolusPerHour = extendedBolus / bolusDuration;
+
+    // Update UI
+    //ui->totalBolusLabel->setText(QString::number(finalBolus, 'f', 2) + " units");
+    //ui->immediateBolusLabel->setText(QString::number(immediateBolus, 'f', 2) + " units now");
+    //ui->extendedBolusLabel->setText(QString::number(bolusPerHour, 'f', 2) + " u/hr for 3 hrs");
+
+    // Deliver Immediate Bolus
+    device->findChild<InsulinControlSystem*>()->simulateBolus(immediateBolus);
+
+    // Schedule Extended Bolus
+    QTimer *extendedBolusTimer = new QTimer(this);
+    int deliveryCount = 0;
+    connect(extendedBolusTimer, &QTimer::timeout, [=, &deliveryCount]() mutable {
+        if (deliveryCount >= bolusDuration) {
+            extendedBolusTimer->stop();
+            extendedBolusTimer->deleteLater();
+        } else {
+            device->findChild<InsulinControlSystem*>()->simulateBolus(bolusPerHour);
+            deliveryCount++;
+        }
+    });
+
+    extendedBolusTimer->start(3600000); // every hour
+
+    appendLog(QString("Immediate Bolus: %1 units | Extended: %2 units over 3 hrs")
+                  .arg(immediateBolus, 0, 'f', 2)
+                  .arg(extendedBolus, 0, 'f', 2));
 }

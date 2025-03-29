@@ -55,11 +55,14 @@ public:
     void setState(State state);
     //void setMode(Mode mode);
     void setBasalRate(double rate);
+    double getCorrectionFactor() const;
     void setCorrectionFactor(double factor);
+    double getCarbRatio() const;
     void setCarbRatio(int carb);
+    double getTargetGlucose() const;
     void setTargetGlucose(double level);
     void setCurrentGlucose(double level);
-    void simulateBolus(double glucoseLevel);
+    void simulateBolus(double injectInsulin);
     double getInsulinOnBoard() const;
     void setTimeStep(int ts);
 
@@ -68,7 +71,6 @@ signals:
     void glucoseChanged(double level);
     void cartChanged(double level);
     void IOBChanged(double amount, double hours);
-    void bolusInjected(double units);
     void logEvent(const QString &event);
 
 private:
@@ -83,7 +85,6 @@ private:
     //Mode currentMode;
     State currentState;
 
-    double calculateBolus(double glucose);
 };
 
 // -------------------- Logger --------------------

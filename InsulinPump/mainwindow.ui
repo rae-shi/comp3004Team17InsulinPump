@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1488</width>
-    <height>433</height>
+    <height>470</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -107,13 +107,6 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="bolusButton">
-        <property name="text">
-         <string>Inject Bolus</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="glucoseLabel">
         <property name="text">
          <string>Current Glucose: 5.5 mmol/L</string>
@@ -174,7 +167,6 @@
      <property name="font">
       <font>
        <family>DejaVu Sans</family>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -678,9 +670,9 @@
    <widget class="QFrame" name="bolusFrame">
     <property name="geometry">
      <rect>
-      <x>1070</x>
-      <y>10</y>
-      <width>411</width>
+      <x>510</x>
+      <y>250</y>
+      <width>491</width>
       <height>161</height>
      </rect>
     </property>
@@ -700,108 +692,177 @@
       </rect>
      </property>
      <property name="text">
-      <string>Bolus:</string>
+      <string>Bolus Claculator:</string>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QLabel" name="carbsLabel">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
-       <width>321</width>
-       <height>19</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="bolusLabelLayout">
-      <item>
-       <widget class="QLabel" name="bolusUnitLabel">
-        <property name="text">
-         <string>Bolus Unit:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="bolusDurationLabel">
-        <property name="text">
-         <string>Duration: </string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>361</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="bolusValueLayout">
-      <item>
-       <widget class="QDoubleSpinBox" name="bolusUnitSpinBox"/>
-      </item>
-      <item>
-       <spacer name="spacer3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="bolusHourSpinBox">
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>12</number>
-        </property>
-        <property name="value">
-         <number>0</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="bolusHourLabel">
-        <property name="text">
-         <string>Hours</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="bolusMinuteSpinBox">
-        <property name="maximum">
-         <number>59</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="bolusMinuteLabel">
-        <property name="text">
-         <string>Minutes</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QPushButton" name="bolusOverrideButton">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>130</y>
-       <width>83</width>
-       <height>25</height>
+       <y>40</y>
+       <width>58</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Override</string>
+      <string>Carbs:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="carbsInputSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>40</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="glucoseLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>40</y>
+       <width>58</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Glucose:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="glucoseInputSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>40</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="deliverNowLabel">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>10</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delivery Now</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="viewCalcButton">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>130</y>
+       <width>121</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>View Calculation</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="deliveryLaterLabel">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>10</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delivery Later</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="deliveryNowPerLabel">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>40</y>
+       <width>58</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>60%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="deliveryLaterPerLabel">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>40</y>
+       <width>58</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>40%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="extendedDurationLabel">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>60</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Extended Duration</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="extendedDurationHourSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>80</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="extendedDurationHourLabel">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>80</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>h</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="extendedDurationMinSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>80</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="extendedDurationMinLabel">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>80</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>m</string>
      </property>
     </widget>
    </widget>
@@ -812,7 +873,7 @@
      <x>0</x>
      <y>0</y>
      <width>1488</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

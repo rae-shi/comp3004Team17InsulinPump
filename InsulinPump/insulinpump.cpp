@@ -103,14 +103,26 @@ void InsulinControlSystem::setBasalRate(double rate) {
     emit logEvent(QString("Basal rate set to %1").arg(rate));
 }
 
+double InsulinControlSystem::getCorrectionFactor() const {
+    return correctionFactor;
+}
+
 void InsulinControlSystem::setCorrectionFactor(double factor){
     correctionFactor = factor;
     emit logEvent(QString("Correction Factor set to %1").arg(factor));
 }
 
+double InsulinControlSystem::getCarbRatio() const {
+    return carbRatio;
+}
+
 void InsulinControlSystem::setCarbRatio(int carb){
     carbRatio = carb;
     emit logEvent(QString("Carb Ratio set to %1").arg(carb));
+}
+
+double InsulinControlSystem::getTargetGlucose() const{
+    return targetGlucose;
 }
 
 void InsulinControlSystem::setTargetGlucose(double level){
@@ -209,19 +221,13 @@ void InsulinControlSystem::updateInsulin() {
                   .arg(basalEffect).arg(currentGlucose).arg(predictedGlu));
 }
 
-void InsulinControlSystem::simulateBolus(double glucoseLevel) {
-    double bolus = calculateBolus(glucoseLevel);
+void InsulinControlSystem::simulateBolus(double bolus) {
     insulinOnBoard += bolus;
     currentGlucose -= bolus * 0.3;      // drop effect
-    if (currentGlucose < 4.0) currentGlucose = 4.0;
+    //if (currentGlucose < 5.0) currentGlucose = 5.0;
 
-    emit bolusInjected(bolus);
     emit glucoseChanged(currentGlucose);
     emit logEvent(QString("Bolus injected: %1 | Glucose: %2").arg(bolus).arg(currentGlucose));
-}
-
-double InsulinControlSystem::calculateBolus(double glucose) {
-    return (glucose > targetGlucose ? (glucose - targetGlucose)/correctionFactor : 0); //calculate bolus based off of correction factor and target glucose
 }
 
 // -------------------- Logger --------------------
