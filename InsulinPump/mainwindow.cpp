@@ -150,6 +150,9 @@ void MainWindow::onBolusClicked() {
 void MainWindow::onChargeClicked(){
     if(ui->batteryBar->value()!=100){
         device->chargeBattery();
+        // Enable the start button after charging
+        ui->startButton->setEnabled(true);
+        appendLog("Battery charged. Device can now be powered on.");
     }
 }
 
@@ -232,8 +235,10 @@ void MainWindow::appendLog(const QString &msg) {
 void MainWindow::onBatteryDepleted() {
     simulationTimer->stop();
     disableAllInput();
-    ui->startButton->setEnabled(true);
+    // Only enable the charge button, not the start button
     ui->chargeButton->setEnabled(true);
+    ui->startButton->setEnabled(false); // Disable power button when battery is dead
     ui->startButton->setText("Power On");
     appendLog("System powered off due to battery depletion.");
+    appendLog("Please charge the battery to power on the device.");
 }
