@@ -23,6 +23,7 @@ private slots:
     void onDisconnectClicked();
     void onSubmitProfileClicked();
     void onEditProfileClicked();
+    void onBatteryDepleted(); // New slot for battery depletion
     void updateBattery(int level);
     void updateCart(double level);
     void updateGlucose(double level);

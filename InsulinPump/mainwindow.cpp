@@ -36,6 +36,7 @@ void MainWindow::connectAllSlots(){
 
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
+    connect(device, &Device::devicePoweredOff, this, &MainWindow::onBatteryDepleted);
     connect(this, &MainWindow::profileUpdated, device, &Device::applyProfile);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
@@ -56,6 +57,7 @@ void MainWindow::disconnectAllSlots(){
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
+    disconnect(device, &Device::devicePoweredOff, this, &MainWindow::onBatteryDepleted);
     disconnect(this, &MainWindow::profileUpdated, device, &Device::applyProfile);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
@@ -225,4 +227,13 @@ void MainWindow::updateIOB(double level, double hours) {
 
 void MainWindow::appendLog(const QString &msg) {
     ui->logOutput->appendPlainText(msg);
+}
+
+void MainWindow::onBatteryDepleted() {
+    simulationTimer->stop();
+    disableAllInput();
+    ui->startButton->setEnabled(true);
+    ui->chargeButton->setEnabled(true);
+    ui->startButton->setText("Power On");
+    appendLog("System powered off due to battery depletion.");
 }

@@ -30,6 +30,7 @@ signals:
     void batteryLevelChanged(int level);
     void insulinInjected(double amount);
     void logEvent(const QString &event);
+    void devicePoweredOff(); // New signal for battery depletion power off
 
 private:
     int batteryLevel; // 0-100%

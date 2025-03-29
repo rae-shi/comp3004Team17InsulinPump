@@ -48,6 +48,8 @@ void Device::runDevice() {
             batteryLevel = 0; // Ensure we don't go below 0
             stopDevice();
             emit logEvent("Device automatically stopped due to depleted battery.");
+            // Add a signal to notify the UI that the device was powered off due to battery depletion
+            emit devicePoweredOff();
         }
 
         emit batteryLevelChanged(batteryLevel);
