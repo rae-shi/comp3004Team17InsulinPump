@@ -147,6 +147,7 @@ void InsulinControlSystem::updateInsulin() {
     // Simulate effect of basal insulin delivery
     double basalEffect = basalRate * 0.1;
     insulinOnBoard += basalEffect;
+
     currentGlucose -= 0.1 * basalRate;
 
     // Add random fluctuations to prevent stabilization
@@ -156,7 +157,8 @@ void InsulinControlSystem::updateInsulin() {
 
 
     // Ensure values remain stable and avoid floating-point errors
-    insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
+    // problematic logic - may keep numbers stuck
+//    insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
     currentGlucose = qRound(currentGlucose * 100) / 100.0;
     cartLevel -= basalEffect;
     basalEffect = qRound(basalEffect * 100) / 100.0;
@@ -165,8 +167,15 @@ void InsulinControlSystem::updateInsulin() {
     insulinOnBoard *= 0.98;
 
     // calculate hours remaining for IOB
-    double remainingTimeMinutes = log(100 / insulinOnBoard) / log(1.02); // Using a decay formula
-    double remainingTimeHours = remainingTimeMinutes / 60.0;  // Convert minutes to hours
+    double remainingTimeHours;
+
+    if (insulinOnBoard > 0.01){
+        double remainingTimeMinutes = log(100 / insulinOnBoard) / log(1.02); // Using a decay formula
+        remainingTimeHours= remainingTimeMinutes / 60.0;  // Convert minutes to hours
+    } else{
+        insulinOnBoard = 0.0;
+        remainingTimeHours = 0.0;
+    }
 
     // Predict glucose trend 30 minutes ahead
     double predictedGlu = currentGlucose - (insulinOnBoard * 0.5);
