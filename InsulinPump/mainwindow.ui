@@ -756,7 +756,7 @@
       <string>Extended Duration:</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -777,6 +777,9 @@
        <widget class="QSpinBox" name="carbsInputSpinBox">
         <property name="minimum">
          <number>1</number>
+        </property>
+        <property name="value">
+         <number>45</number>
         </property>
        </widget>
       </item>
@@ -811,6 +814,9 @@
         <property name="maximum">
          <double>10.000000000000000</double>
         </property>
+        <property name="value">
+         <double>5.500000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -828,7 +834,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -860,7 +866,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>320</x>
