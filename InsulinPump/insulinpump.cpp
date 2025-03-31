@@ -93,7 +93,6 @@ double InsulinControlSystem::getCartridgeLevel() const {
 void Device::refillCartridge() {
     if (ics) {
         ics->refillCartridge();
-        emit logEvent("Cartridge refilled to 300 units.");
     }
 }
 
@@ -250,7 +249,6 @@ void InsulinControlSystem::simulateBolus(double bolus) {
 void InsulinControlSystem::refillCartridge() {
     cartLevel = 300.0;
     emit cartChanged(cartLevel);
-    emit logEvent("Cartridge refilled to 300 units.");
 }
 
 void InsulinControlSystem::depleteCartridge(double amount) {
