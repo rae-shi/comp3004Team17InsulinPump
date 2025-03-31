@@ -84,10 +84,21 @@ void Device::depleteBattery() {
     emit logEvent("Battery depleted.");
 }
 
+void Device::setBatteryLevel(int level) {
+    batteryLevel = qBound(0, level, 100);
+    emit batteryLevelChanged(batteryLevel);
+}
+
 int Device::getBatteryLevel() const {
     return batteryLevel;
 }
 
+void Device::refillCartridge() {
+    if (ics) {
+        ics->refillCartridge();
+        emit logEvent("Cartridge refilled to 300 units.");
+    }
+}
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
@@ -238,6 +249,20 @@ void InsulinControlSystem::simulateBolus(double bolus) {
 
     emit glucoseChanged(currentGlucose);
     emit logEvent(QString("Bolus injected: %1 | Glucose: %2").arg(bolus).arg(currentGlucose));
+}
+
+void InsulinControlSystem::refillCartridge() {
+    cartLevel = 300.0;
+    emit cartChanged(cartLevel);
+    emit logEvent("Cartridge refilled to 300 units.");
+}
+
+void InsulinControlSystem::depleteCartridge(double amount) {
+    cartLevel = qMax(0.0, cartLevel - amount);
+    emit cartChanged(cartLevel);
+    if (cartLevel == 0) {
+        emit logEvent("Cartridge is empty.");
+    }
 }
 
 // -------------------- Logger --------------------

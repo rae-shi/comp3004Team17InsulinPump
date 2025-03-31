@@ -20,6 +20,8 @@ public:
     void stopDevice();
     void chargeBattery();
     void depleteBattery();
+    void refillCartridge();
+    void setBatteryLevel(int level);
 
     int getBatteryLevel() const;
 
@@ -66,6 +68,8 @@ public:
     void simulateBolus(double injectInsulin);
     double getInsulinOnBoard() const;
     void setTimeStep(int ts);
+    void refillCartridge();
+    void depleteCartridge(double amount);
 
 signals:
     void insulinDelivered(double amount);
