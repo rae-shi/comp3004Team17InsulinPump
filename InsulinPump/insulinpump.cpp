@@ -250,6 +250,12 @@ void InsulinControlSystem::refillCartridge() {
 void InsulinControlSystem::depleteCartridge(double amount) {
     cartLevel = qMax(0.0, cartLevel - amount);
     emit cartChanged(cartLevel);
+    
+    // Check for low insulin warning threshold (30 units)
+    if (cartLevel == 30.0) {
+        emit logEvent("WARNING: Insulin level low (%10).");
+    }
+    
     if (cartLevel == 0) {
         emit logEvent("Cartridge is empty.");
     }
