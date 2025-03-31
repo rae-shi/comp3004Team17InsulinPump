@@ -56,9 +56,9 @@ void Device::runDevice() {
     }
 }
 
-void Device::applyProfile(double basalRate, double correctionFactor, int carbRatio, double targetGlucose) {
+void Device::applyProfile(double pbasalRate, double correctionFactor, int carbRatio, double targetGlucose) {
     if (ics) {
-        ics->setBasalRate(basalRate);
+        ics->setProfileBasalRate(pbasalRate);
         ics->setCorrectionFactor(correctionFactor);
         ics->setCarbRatio(carbRatio);
         ics->setTargetGlucose(targetGlucose);
@@ -102,7 +102,7 @@ void Device::refillCartridge() {
 
 // -------------------- InsulinControlSystem --------------------
 InsulinControlSystem::InsulinControlSystem(QObject *parent)
-    : QObject(parent), basalRate(1.0), correctionFactor(1.0), carbRatio(1), targetGlucose(5.0), currentGlucose(5.5), insulinOnBoard(0.0), cartLevel(300.00), currentState(Run){}
+    : QObject(parent), basalRate(1.0), correctionFactor(1.0), carbRatio(1), targetGlucose(5.0), currentGlucose(5.5), insulinOnBoard(0.0), cartLevel(300.00), currentState(Run), profileBasalRate(0.0){}
 
 void InsulinControlSystem::setState(State state) {
     currentState = state;
@@ -112,6 +112,11 @@ void InsulinControlSystem::setState(State state) {
 void InsulinControlSystem::setBasalRate(double rate) {
     basalRate = rate;
     emit logEvent(QString("Basal rate set to %1").arg(rate));
+}
+
+void InsulinControlSystem::setProfileBasalRate(double rate) {
+    profileBasalRate = rate;
+    emit logEvent(QString("Profile basal rate set to %1").arg(rate));
 }
 
 double InsulinControlSystem::getCorrectionFactor() const {
@@ -158,30 +163,35 @@ double InsulinControlSystem::getInsulinOnBoard() const {
 
 void InsulinControlSystem::updateInsulin() {
     // by ICS logic, each time step is a minute
+    double basalEffect = 0;
+
     if (currentState == Stop) return;
     if (currentState == Pause){
         setBasalRate(0);
     } else if (currentState == Resume){
         currentState = Run;
-        setBasalRate(1.0);
+        setBasalRate(profileBasalRate);
     }
 
+    // Adjust active basal rate based  on profile basal rate
+    if (currentState != Pause){
+        // Simulate effect of basal insulin delivery
+        // Calculate basal effect as 1/10th basal rate for simultation reasons
+        basalEffect = basalRate * 0.1;
+        insulinOnBoard += basalEffect;
 
-    // Simulate effect of basal insulin delivery
-    double basalEffect = basalRate * 0.1;
-    insulinOnBoard += basalEffect;
-
-    currentGlucose -= 0.1 * basalRate;
+        currentGlucose -= 0.1 * basalRate;
+    } else if (currentState == Pause){
+        currentGlucose += 0.05;
+    }
 
     // Add random fluctuations to prevent stabilization
-    // Range: -0.15 to 0.15
-    double noiseFactor = QRandomGenerator::global()->generateDouble() * 0.3 - 0.15;
+    double noiseFactor = QRandomGenerator::global()->generateDouble() * 0.2 - 0.1;
     currentGlucose += noiseFactor;
 
 
     // Ensure values remain stable and avoid floating-point errors
     // problematic logic - may keep numbers stuck
-//    insulinOnBoard = qRound(insulinOnBoard * 100) / 100.0;
     currentGlucose = qRound(currentGlucose * 100) / 100.0;
     cartLevel -= basalEffect;
     basalEffect = qRound(basalEffect * 100) / 100.0;
@@ -201,25 +211,25 @@ void InsulinControlSystem::updateInsulin() {
     }
 
     // Predict glucose trend 30 minutes ahead
-    double predictedGlu = currentGlucose - (insulinOnBoard * 0.5);
+    double predictedGlu = currentGlucose - (insulinOnBoard * 0.1667);
     // Small random fluctuation
     predictedGlu += QRandomGenerator::global()->generateDouble() * 0.2 - 0.1;
     predictedGlu = qRound(predictedGlu * 100) / 100.0;
 
     // Adjust insulin delivery based on Control-IQ technology rules
-    if (predictedGlu <= 3.9) {
-        emit logEvent("User is hypoglycemic");
+    if (predictedGlu <= targetGlucose-0.1) {
         basalRate = 0.0;  // Suspend insulin if glucose is too low
-    } else if (predictedGlu <= 6.25) {
+    } else if (predictedGlu <= targetGlucose+0.03) {
         basalRate = qMax(basalRate * 0.5, 0.1);  // Reduce insulin
-    } else if (predictedGlu >= 8.9) {
-        emit logEvent("User is hyperglycemic");
+    } else if (predictedGlu >= targetGlucose+0.5) {
         double maxBasalRate = 2.0;
         basalRate = qMin(basalRate * 1.2, maxBasalRate);  // Increase insulin
     }
-    // If lowest glucose is min 4.0
-    if (currentState == Run){
-        if (currentGlucose < 4.0) currentGlucose = 4.0;
+
+    if (predictedGlu < 3.9){
+        emit logEvent("User is hypoglycemic");
+    } else if(predictedGlu >= 8.9){
+        emit logEvent("User is hyperglycemic");
     }
 
 

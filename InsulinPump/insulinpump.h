@@ -57,6 +57,7 @@ public:
     void setState(State state);
     //void setMode(Mode mode);
     void setBasalRate(double rate);
+    void setProfileBasalRate(double rate);
     double getCorrectionFactor() const;
     void setCorrectionFactor(double factor);
     double getCarbRatio() const;
@@ -80,6 +81,7 @@ signals:
 private:
     int timeStep;
     double basalRate;
+    double profileBasalRate;
     double correctionFactor;
     int carbRatio;
     double targetGlucose;
