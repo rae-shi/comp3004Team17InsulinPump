@@ -29,10 +29,8 @@ private slots:
     void updateIOB(double level, double hours);
     void appendLog(const QString &msg);
     void onRefillCartridgeClicked();
-    void onDepleteBatteryPressed();
-    void onDepleteBatteryReleased();
-    void onDepleteCartridgePressed();
-    void onDepleteCartridgeReleased();
+    void onDepleteBatteryClicked();
+    void onDepleteCartridgeClicked();
     void decrementBattery();
     void decrementCartridge();
 

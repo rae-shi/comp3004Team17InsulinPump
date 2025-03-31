@@ -34,25 +34,15 @@ void Device::runDevice() {
     ics->setTimeStep(timeStep);
     ics->updateInsulin();
 
-    // Battery discharge rate to 1% every 3 steps
     if (timeStep % 3 == 0) {
         batteryLevel -= 1;
-
-        // Log low battery warning at 10%
-        if (batteryLevel == 10) {
-            emit logEvent("WARNING: Battery level low (10%).");
-        }
-
-        // Stop device when battery is depleted
         if (batteryLevel <= 0) {
-            batteryLevel = 0; // Ensure we don't go below 0
+            batteryLevel = 0;
             stopDevice();
             emit logEvent("Device automatically stopped due to depleted battery.");
-            // Add a signal to notify the UI that the device was powered off due to battery depletion
             emit devicePoweredOff();
         }
-
-        emit batteryLevelChanged(batteryLevel);
+        emit batteryLevelChanged(batteryLevel); // This will trigger setBatteryLevel indirectly via UI
     }
 }
 
@@ -86,11 +76,18 @@ void Device::depleteBattery() {
 
 void Device::setBatteryLevel(int level) {
     batteryLevel = qBound(0, level, 100);
+    if (batteryLevel == 10) {
+        emit logEvent("WARNING: Battery level low (10%).");
+    }
     emit batteryLevelChanged(batteryLevel);
 }
 
 int Device::getBatteryLevel() const {
     return batteryLevel;
+}
+
+double InsulinControlSystem::getCartridgeLevel() const {
+    return cartLevel;
 }
 
 void Device::refillCartridge() {
@@ -159,7 +156,6 @@ void InsulinControlSystem:: setTimeStep(int ts){
 double InsulinControlSystem::getInsulinOnBoard() const {
     return insulinOnBoard;
 }
-
 
 void InsulinControlSystem::updateInsulin() {
     // by ICS logic, each time step is a minute
@@ -263,7 +259,7 @@ void InsulinControlSystem::depleteCartridge(double amount) {
     
     // Check for low insulin warning threshold (30 units)
     if (cartLevel == 30.0) {
-        emit logEvent("WARNING: Insulin level low (%10).");
+        emit logEvent("WARNING: Insulin level low (30 units).");
     }
     
     if (cartLevel == 0) {

@@ -70,6 +70,8 @@ public:
     void setTimeStep(int ts);
     void refillCartridge();
     void depleteCartridge(double amount);
+    double getCartridgeLevel() const;
+
 
 signals:
     void insulinDelivered(double amount);
