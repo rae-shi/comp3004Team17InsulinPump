@@ -1,4 +1,4 @@
-QT += core gui widgets
+QT += core gui widgets testlib
 
 # Local SDK fix (only for macOS 15.2+):
 # COMMENT THIS OUT IF YOU ARE NOT USING MACOS
@@ -9,7 +9,8 @@ CONFIG += c++11
 SOURCES += \
     insulinpump.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    tests.cpp
 
 HEADERS += \
     insulinpump.h \
