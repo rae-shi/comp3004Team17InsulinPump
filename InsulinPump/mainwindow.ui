@@ -21,10 +21,10 @@
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::Shape::StyledPanel</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Shadow::Raised</enum>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -32,7 +32,7 @@
        <x>10</x>
        <y>10</y>
        <width>451</width>
-       <height>318</height>
+       <height>341</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="mainLayout">
@@ -46,6 +46,17 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="disconnectButton">
+          <property name="text">
+           <string>Disconnect</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="buttonLayout_2">
+        <item>
          <widget class="QPushButton" name="chargeButton">
           <property name="text">
            <string>Charge Battery</string>
@@ -53,9 +64,23 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="disconnectButton">
+         <widget class="QPushButton" name="depleteBatteryButton">
           <property name="text">
-           <string>Disconnect</string>
+           <string>Deplete Battery</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="refillCartridgeButton">
+          <property name="text">
+           <string>Refill Cartridge</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="depleteCartridgeButton">
+          <property name="text">
+           <string>Deplete Cartridge</string>
           </property>
          </widget>
         </item>
@@ -150,10 +175,10 @@
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::Shape::StyledPanel</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Shadow::Raised</enum>
     </property>
     <widget class="QLabel" name="profileHeaderLabel">
      <property name="geometry">
@@ -167,7 +192,6 @@
      <property name="font">
       <font>
        <family>DejaVu Sans</family>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -705,10 +729,10 @@
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::Shape::StyledPanel</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Shadow::Raised</enum>
     </property>
     <widget class="QLabel" name="bolusHeaderLabel">
      <property name="geometry">
@@ -722,7 +746,6 @@
      <property name="font">
       <font>
        <family>DejaVu Sans</family>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>

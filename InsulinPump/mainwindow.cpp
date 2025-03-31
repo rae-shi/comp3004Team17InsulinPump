@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
     disableAllInput();
     ui->startButton->setEnabled(true);
     ui->chargeButton->setEnabled(true);
+    ui->refillCartridgeButton->setEnabled(true);
+    ui->depleteBatteryButton->setEnabled(true);
+    ui->depleteCartridgeButton->setEnabled(true);
 
     device->setupDevice();
     appendLog(QString("------------------"));
@@ -30,11 +33,22 @@ MainWindow::~MainWindow() {
 void MainWindow::connectAllSlots(){
     // Connections
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
-    connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     connect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
     connect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     connect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
     connect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
+
+    // For battery and cartridge refill
+    connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
+    connect(ui->refillCartridgeButton, &QPushButton::clicked, this, &MainWindow::onRefillCartridgeClicked);
+
+    // For battery depletion (press-and-hold functionality)
+    connect(ui->depleteBatteryButton, &QPushButton::pressed, this, &MainWindow::onDepleteBatteryPressed);
+    connect(ui->depleteBatteryButton, &QPushButton::released, this, &MainWindow::onDepleteBatteryReleased);
+
+    // For cartridge depletion (press-and-hold functionality)
+    connect(ui->depleteCartridgeButton, &QPushButton::pressed, this, &MainWindow::onDepleteCartridgePressed);
+    connect(ui->depleteCartridgeButton, &QPushButton::released, this, &MainWindow::onDepleteCartridgeReleased);
 
     connect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     connect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -50,12 +64,23 @@ void MainWindow::connectAllSlots(){
 
 void MainWindow::disconnectAllSlots(){
     disconnect(ui->startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
-    disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
     disconnect(ui->disconnectButton, &QPushButton::clicked, this, &MainWindow::onDisconnectClicked);
     disconnect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     disconnect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
     disconnect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
     disconnect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
+
+    // For battery and cartridge refill
+    disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
+    disconnect(ui->refillCartridgeButton, &QPushButton::clicked, this, &MainWindow::onRefillCartridgeClicked);
+
+    // For battery depletion (press-and-hold functionality)
+    disconnect(ui->depleteBatteryButton, &QPushButton::pressed, this, &MainWindow::onDepleteBatteryPressed);
+    disconnect(ui->depleteBatteryButton, &QPushButton::released, this, &MainWindow::onDepleteBatteryReleased);
+
+    // For cartridge depletion (press-and-hold functionality)
+    disconnect(ui->depleteCartridgeButton, &QPushButton::pressed, this, &MainWindow::onDepleteCartridgePressed);
+    disconnect(ui->depleteCartridgeButton, &QPushButton::released, this, &MainWindow::onDepleteCartridgeReleased);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -75,6 +100,9 @@ void MainWindow::enableAllInput(){
     ui->editProfileButton->setEnabled(true);
     ui->submitProfileButton->setEnabled(true);
     ui->viewCalcButton->setEnabled(true);
+    ui->refillCartridgeButton->setEnabled(true);
+    ui->depleteBatteryButton->setEnabled(true);
+    ui->depleteCartridgeButton->setEnabled(true);
     ui->extendedDurationHourSpinBox->setValue(3);
     ui->extendedDurationMinSpinBox->setValue(0);
 
@@ -99,6 +127,9 @@ void MainWindow::disableAllInput(){
     ui->editProfileButton->setEnabled(false);
     ui->submitProfileButton->setEnabled(false);
     ui->viewCalcButton->setEnabled(false);
+    ui->refillCartridgeButton->setEnabled(false);
+    ui->depleteBatteryButton->setEnabled(false);
+    ui->depleteCartridgeButton->setEnabled(false);
 
     //radio buttons
     ui->morningProfileRadioButton->setEnabled(false);
@@ -313,4 +344,97 @@ void MainWindow::onCalculateBolus() {
     appendLog(QString("Immediate Bolus: %1 units | Extended: %2 units over 3 hrs")
                   .arg(immediateBolus, 0, 'f', 2)
                   .arg(extendedBolus, 0, 'f', 2));
+}
+
+void MainWindow::onRefillCartridgeClicked() {
+    device->refillCartridge();
+    appendLog("Cartridge refilled to 300 units.");
+}
+
+// Timer for battery depletion when button is held
+QTimer* batteryDepletionTimer = nullptr;
+
+void MainWindow::onDepleteBatteryPressed() {
+    // Create timer if it doesn't exist
+    if (!batteryDepletionTimer) {
+        batteryDepletionTimer = new QTimer(this);
+        connect(batteryDepletionTimer, &QTimer::timeout, this, &MainWindow::decrementBattery);
+    }
+    
+    // Start timer with fast interval (100ms for rapid depletion)
+    batteryDepletionTimer->start(100);
+}
+
+void MainWindow::onDepleteBatteryReleased() {
+    // Stop the timer when button is released
+    if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
+        batteryDepletionTimer->stop();
+    }
+}
+
+// Timer for cartridge depletion when button is held
+QTimer* cartridgeDepletionTimer = nullptr;
+
+void MainWindow::onDepleteCartridgePressed() {
+    // Create timer if it doesn't exist
+    if (!cartridgeDepletionTimer) {
+        cartridgeDepletionTimer = new QTimer(this);
+        connect(cartridgeDepletionTimer, &QTimer::timeout, this, &MainWindow::decrementCartridge);
+    }
+    
+    // Start timer with fast interval (100ms for rapid depletion)
+    cartridgeDepletionTimer->start(100);
+}
+
+void MainWindow::onDepleteCartridgeReleased() {
+    // Stop the timer when button is released
+    if (cartridgeDepletionTimer && cartridgeDepletionTimer->isActive()) {
+        cartridgeDepletionTimer->stop();
+    }
+}
+
+void MainWindow::decrementBattery() {
+    // Get current battery level
+    int currentLevel = ui->batteryBar->value();
+    
+    // Decrement by 5% each time for visible effect
+    currentLevel = qMax(0, currentLevel - 5);
+    
+    // Update battery level
+    device->setBatteryLevel(currentLevel);
+    ui->batteryBar->setValue(currentLevel);
+    
+    // When battery fully depleted, trigger power off
+    if (currentLevel <= 0) {
+        if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
+            batteryDepletionTimer->stop();
+        }
+        onBatteryDepleted();
+    }
+}
+
+void MainWindow::decrementCartridge() {
+    // Get current cartridge level from UI
+    double currentLevel = ui->cartridge->value();
+    
+    // Decrement by 5 units each time for visible effect
+    currentLevel = qMax(0.0, currentLevel - 5.0);
+    
+    // Update cartridge level
+    InsulinControlSystem *ics = device->findChild<InsulinControlSystem*>();
+    if (ics) {
+        ics->depleteCartridge(5.0); // This will emit signals to update UI
+    } else {
+        // Fallback in case ICS not found
+        ui->cartridge->setValue(currentLevel);
+        ui->cartridge->setFormat(QString("Cartridge: %1 u").arg(currentLevel, 0, 'f', 2));
+    }
+    
+    // When cartridge empty, stop the timer
+    if (currentLevel <= 0) {
+        if (cartridgeDepletionTimer && cartridgeDepletionTimer->isActive()) {
+            cartridgeDepletionTimer->stop();
+        }
+        appendLog("Warning: Insulin cartridge is empty!");
+    }
 }
