@@ -79,6 +79,7 @@ signals:
     void cartChanged(double level);
     void IOBChanged(double amount, double hours);
     void logEvent(const QString &event);
+    void addPointy(int t, double g);
 
 private:
     int timeStep;

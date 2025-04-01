@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     appendLog(QString("------------------"));
     appendLog("Profile defaulted to Morning.");
     emit profileUpdated(ui->morningBRSpinBox->value(), ui->morningCFSpinBox->value(), ui->morningCRSpinBox->value(), ui->morningBGSpinBox->value());
+
+    initializeGraph();
 }
 
 MainWindow::~MainWindow() {
@@ -56,6 +58,8 @@ void MainWindow::connectAllSlots(){
     connect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
 
     connect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
+    connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::addPointy, this, &MainWindow::addPoint);
+
 }
 
 void MainWindow::disconnectAllSlots(){
@@ -300,7 +304,7 @@ void MainWindow::onCalculateBolus() {
     double correctionBolus = glucoseInput > targetBG ? (glucoseInput - targetBG) / CF : 0;
     double totalBolus = carbBolus + correctionBolus;
     double finalBolus = totalBolus - IOB;
-    appendLog(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, totoal: %5, iob:%6 | finalBolus:%7")
+    appendLog(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, total: %5, iob:%6 | finalBolus:%7")
                   .arg(carbInput).arg(ICR).arg(glucoseInput).arg(targetBG).arg(totalBolus)
                   .arg(IOB).arg(finalBolus).arg(CF));
 
@@ -397,4 +401,58 @@ void MainWindow::decrementCartridge() {
         ui->cartridge->setValue(currentLevel);
         ui->cartridge->setFormat(QString("Cartridge: %1 u").arg(currentLevel, 0, 'f', 2));
     }
+}
+
+
+
+
+
+void MainWindow::initializeGraph(){
+    // Set graph up
+    series = new QLineSeries();
+    chart = new QChart();
+    chart->legend()->hide();
+    chart->addSeries(series);
+
+
+    // Set x-axis info
+    QValueAxis *xAxis = new QValueAxis;
+    xAxis->setLabelFormat("%.0f");
+    xAxis->setLabelsBrush(Qt::transparent);
+    // Set graph to only show hour of glucose levels
+    xAxis->setRange(0, 60);
+    xAxis->setTitleText("Time (m)");
+
+    // Sset y-axis info
+    QValueAxis *yAxis = new QValueAxis;
+    yAxis->setLabelFormat("%.2f");
+    yAxis->setRange(3.0, 8.0);
+    yAxis->setTitleText("Glucose (mmol/L)");
+    yAxis->setTickCount(6);
+
+    // Adjust graph display
+    chart->addAxis(xAxis, Qt::AlignBottom);
+    chart->addAxis(yAxis, Qt::AlignRight);
+    series->attachAxis(xAxis);
+    series->attachAxis(yAxis);
+
+
+    chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->resize(ui->horizontalFrame->size());
+    chartView->setParent(ui->horizontalFrame);
+
+}
+
+void MainWindow::addPoint(int x, double y){
+    series->append(x, y);
+
+   // Get the current x-axis range
+   QValueAxis *xAxis = qobject_cast<QValueAxis *>(chart->axes(Qt::Horizontal).first());
+
+   if (x > xAxis->max()) {  // If new point exceeds the max range
+       xAxis->setRange(xAxis->min() + 1, x);  // Shift the range dynamically
+   }
+
+   chartView->repaint();
 }

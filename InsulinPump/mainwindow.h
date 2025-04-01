@@ -1,8 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
 #include "insulinpump.h"
+#include <QtCharts>
+#include <QChartView>
+#include <QLineSeries>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -42,12 +47,17 @@ private:
     Ui::MainWindow *ui;
     Device *device;
     QTimer *simulationTimer;
+    QChart *chart;
+    QChartView *chartView;
+    QLineSeries *series;
 
     void connectAllSlots();
     void disconnectAllSlots();
     void enableAllInput();
     void disableAllInput();
     void onCalculateBolus();
+    void initializeGraph();
+    void addPoint(int time, double glucose);
 };
 
 #endif // MAINWINDOW_H

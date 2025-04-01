@@ -227,7 +227,7 @@ void InsulinControlSystem::updateInsulin() {
         emit logEvent("User is hyperglycemic");
     }
 
-
+    emit addPointy(timeStep,currentGlucose);
     // Emit updated values - gui dependent - change as needed
     emit IOBChanged(insulinOnBoard, remainingTimeHours);
     emit insulinDelivered(basalEffect);
@@ -239,10 +239,11 @@ void InsulinControlSystem::updateInsulin() {
 
 void InsulinControlSystem::simulateBolus(double bolus) {
     insulinOnBoard += bolus;
-    currentGlucose -= bolus * 0.3;      // drop effect
-    //if (currentGlucose < 5.0) currentGlucose = 5.0;
+    currentGlucose -= bolus * 0.3;
 
     emit glucoseChanged(currentGlucose);
+    cartLevel -= bolus;
+    emit cartChanged(cartLevel);
     emit logEvent(QString("Bolus injected: %1 | Glucose: %2").arg(bolus).arg(currentGlucose));
 }
 

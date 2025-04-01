@@ -1,4 +1,5 @@
 QT += core gui widgets testlib
+QT       += core gui charts
 
 # Local SDK fix (only for macOS 15.2+):
 # COMMENT THIS OUT IF YOU ARE NOT USING MACOS
