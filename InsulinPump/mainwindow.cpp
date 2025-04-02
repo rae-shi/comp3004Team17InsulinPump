@@ -508,6 +508,7 @@ void MainWindow::clickOcclusion(){
         disableAllInput();
         ui->occlusion->setText("Resolve Occlusion");
         appendErrorLog("Occlusion occured, check infusion site for blockages.");
+        appendLog("Occlusion occured, check infusion site for blockages.");
     } else if (ui->occlusion->text() == "Resolve Occlusion"){
         device->startDevice();
         simulationTimer->start(1000); // 1 second = 1 time step
@@ -515,6 +516,8 @@ void MainWindow::clickOcclusion(){
         enableAllInput();
         ui->occlusion->setText("Cause Occlusion");
         appendErrorLog("Occlusion resolved, infusion site has no blockages.");
+        appendLog("Occlusion resolved, infusion site has no blockages.");
+
     }
 }
 
