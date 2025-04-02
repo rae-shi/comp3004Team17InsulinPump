@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     emit profileUpdated(ui->morningBRSpinBox->value(), ui->morningCFSpinBox->value(), ui->morningCRSpinBox->value(), ui->morningBGSpinBox->value());
 
     initializeGraph();
+    ui->logOutput->setVisible(false);
+    ui->logFrame->setVisible(false);
 }
 
 MainWindow::~MainWindow() {
@@ -39,6 +41,8 @@ void MainWindow::connectAllSlots(){
     connect(ui->submitProfileButton, &QPushButton::clicked, this, &MainWindow::onSubmitProfileClicked);
     connect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
     connect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
+    connect(ui->checkHistory, &QPushButton::clicked, this, &MainWindow::checkHistory);
+
 
     // For battery and cartridge refill
     connect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
@@ -56,9 +60,12 @@ void MainWindow::connectAllSlots(){
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::cartChanged, this, &MainWindow::updateCart);
     connect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
+    connect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::clickOcclusion);
 
     connect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::addPointy, this, &MainWindow::addPoint);
+    connect(device, &Device::logError, this, &MainWindow::appendErrorLog);
+
 
 }
 
@@ -69,6 +76,7 @@ void MainWindow::disconnectAllSlots(){
     disconnect(ui->editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
     disconnect(ui->viewCalcButton, &QPushButton::clicked, this, &MainWindow::onCalculateBolus);
     disconnect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
+    disconnect(ui->checkHistory, &QPushButton::clicked, this, &MainWindow::checkHistory);
 
     // For battery and cartridge refill
     disconnect(ui->chargeButton, &QPushButton::clicked, this, &MainWindow::onChargeClicked);
@@ -77,13 +85,17 @@ void MainWindow::disconnectAllSlots(){
     // For battery and cartridge depletion (click functionality)
     disconnect(ui->depleteBatteryButton, &QPushButton::clicked, this, &MainWindow::onDepleteBatteryClicked);
     disconnect(ui->depleteCartridgeButton, &QPushButton::clicked, this, &MainWindow::onDepleteCartridgeClicked);
+    disconnect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::clickOcclusion);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
+    disconnect(device, &Device::logError, this, &MainWindow::appendErrorLog);
     disconnect(device, &Device::devicePoweredOff, this, &MainWindow::onBatteryDepleted);
     disconnect(this, &MainWindow::profileUpdated, device, &Device::applyProfile);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::glucoseChanged, this, &MainWindow::updateGlucose);
     disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
+    disconnect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::addPointy, this, &MainWindow::addPoint);
+
 
     disconnect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
 }
@@ -101,6 +113,7 @@ void MainWindow::enableAllInput(){
     ui->depleteCartridgeButton->setEnabled(true);
     ui->extendedDurationHourSpinBox->setValue(3);
     ui->extendedDurationMinSpinBox->setValue(0);
+    ui->pauseIns->setEnabled(true);
 
     //radio buttons
     ui->morningProfileRadioButton->setEnabled(true);
@@ -126,6 +139,7 @@ void MainWindow::disableAllInput(){
     ui->refillCartridgeButton->setEnabled(false);
     ui->depleteBatteryButton->setEnabled(false);
     ui->depleteCartridgeButton->setEnabled(false);
+    ui->pauseIns->setEnabled(false);
 
     //radio buttons
     ui->morningProfileRadioButton->setEnabled(false);
@@ -188,6 +202,7 @@ void MainWindow::onChargeClicked(){
 void MainWindow::onDisconnectClicked(){
     appendLog(QString("------------------"));
     appendLog("!! Device Disconnected from Person !!\nPlease reconnect and power the system back on.");
+    appendErrorLog("!! Device Disconnected from Person !!\nPlease reconnect and power the system back on.");
     onStartClicked();
 }
 
@@ -267,6 +282,12 @@ void MainWindow::appendLog(const QString &msg) {
     ui->logOutput->appendPlainText(msg);
 }
 
+void MainWindow::appendErrorLog(const QString &msg) {
+    ui->errorLog->clear();
+    ui->errorLog->appendPlainText(msg);
+}
+
+
 void MainWindow::onBatteryDepleted() {
     simulationTimer->stop();
     disableAllInput();
@@ -276,6 +297,7 @@ void MainWindow::onBatteryDepleted() {
     ui->startButton->setText("Power On");
     appendLog("System powered off due to battery depletion.");
     appendLog("Please charge the battery to power on the device.");
+    appendErrorLog("System powered off due to battery depletion.\nPlease charge the battery to power on the device.");
 }
 
 void MainWindow::onCalculateBolus() {
@@ -287,6 +309,7 @@ void MainWindow::onCalculateBolus() {
         appendLog(QString("Glucose set to: %1 mmol/L").arg(glucoseInput, 0, 'f', 1));
     } else {
         appendLog("Error: InsulinControlSystem not found.");
+        appendErrorLog("Error: InsulinControlSystem not found.");
     }
 
     int bolusDurationHour = ui->extendedDurationHourSpinBox->value();
@@ -351,12 +374,14 @@ void MainWindow::onDepleteBatteryClicked() {
     // Call the existing decrement function directly
     decrementBattery();
     appendLog("Battery depleted.");
+    appendErrorLog("Battery depleted.");
 }
 
 void MainWindow::onDepleteCartridgeClicked() {
     // Call the existing decrement function directly
     decrementCartridge();
     appendLog("Insulin cartridge depleted.");
+    appendErrorLog("Insulin cartridge depleted.");
 }
 
 void MainWindow::decrementBattery() {
@@ -455,4 +480,43 @@ void MainWindow::addPoint(int x, double y){
    }
 
    chartView->repaint();
+   ui->timeStep->display(QString::number(x));
 }
+
+void MainWindow::checkHistory(){
+
+    if (ui->checkHistory->text() == "Check History Logs"){
+        ui->logOutput->setVisible(true);
+        ui->logFrame->setVisible(true);
+        ui->checkHistory->setText("Close History Logs");
+    } else if (ui->checkHistory->text() == "Close History Logs"){
+        ui->logOutput->setVisible(false);
+        ui->logFrame->setVisible(false);
+        ui->checkHistory->setText("Check History Logs");
+    }
+
+}
+
+
+
+
+void MainWindow::clickOcclusion(){
+    if (ui->occlusion->text() == "Cause Occlusion"){
+        simulationTimer->stop();
+        device->stopDevice();
+        appendLog("Power off.");
+        disableAllInput();
+        ui->occlusion->setText("Resolve Occlusion");
+        appendErrorLog("Occlusion occured, check infusion site for blockages.");
+    } else if (ui->occlusion->text() == "Resolve Occlusion"){
+        device->startDevice();
+        simulationTimer->start(1000); // 1 second = 1 time step
+        appendLog("Power on.");
+        enableAllInput();
+        ui->occlusion->setText("Cause Occlusion");
+        appendErrorLog("Occlusion resolved, infusion site has no blockages.");
+    }
+}
+
+
+

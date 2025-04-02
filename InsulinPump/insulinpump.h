@@ -32,6 +32,7 @@ signals:
     void batteryLevelChanged(int level);
     void insulinInjected(double amount);
     void logEvent(const QString &event);
+    void logError(const QString &event);
     void devicePoweredOff(); // New signal for battery depletion power off
 
 private:
@@ -79,6 +80,7 @@ signals:
     void cartChanged(double level);
     void IOBChanged(double amount, double hours);
     void logEvent(const QString &event);
+    void logError(const QString &event);
     void addPointy(int t, double g);
 
 private:

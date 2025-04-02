@@ -33,11 +33,14 @@ private slots:
     void updateGlucose(double level);
     void updateIOB(double level, double hours);
     void appendLog(const QString &msg);
+    void appendErrorLog (const QString &msg);
     void onRefillCartridgeClicked();
     void onDepleteBatteryClicked();
     void onDepleteCartridgeClicked();
     void decrementBattery();
     void decrementCartridge();
+    void checkHistory();
+    void clickOcclusion();
 
 signals:
     void profileUpdated(double basalRate, double correctionFactor, int carbRatio, double targetGlucose);

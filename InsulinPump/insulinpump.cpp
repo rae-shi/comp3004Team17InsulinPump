@@ -8,6 +8,7 @@ Device::Device(QObject *parent)
 
     connect(ics, SIGNAL(insulinDelivered(double)), this, SIGNAL(insulinInjected(double)));
     connect(ics, SIGNAL(logEvent(QString)), this, SIGNAL(logEvent(QString)));
+    connect(ics, SIGNAL(logError(QString)), this, SIGNAL(logError(QString)));
 }
 
 void Device::setupDevice() {
@@ -40,6 +41,7 @@ void Device::runDevice() {
             batteryLevel = 0;
             stopDevice();
             emit logEvent("Device automatically stopped due to depleted battery.");
+            emit logError("Device automatically stopped due to depleted battery.");
             emit devicePoweredOff();
         }
         emit batteryLevelChanged(batteryLevel); // This will trigger setBatteryLevel indirectly via UI
@@ -60,6 +62,7 @@ void Device::stopDevice() {
     ics->setState(InsulinControlSystem::Stop);
     emit logEvent(QString("------------------"));
     emit logEvent("Device stopped.");
+    emit logError("Device stopped.");
 }
 
 void Device::chargeBattery() {
@@ -72,12 +75,15 @@ void Device::depleteBattery() {
     batteryLevel = 0;
     emit batteryLevelChanged(batteryLevel);
     emit logEvent("Battery depleted.");
+    emit logError("Battery depleted.");
 }
 
 void Device::setBatteryLevel(int level) {
     batteryLevel = qBound(0, level, 100);
     if (batteryLevel == 10) {
         emit logEvent("WARNING: Battery level low (10%).");
+        emit logError("WARNING: Battery level low (10%).");
+
     }
     emit batteryLevelChanged(batteryLevel);
 }
@@ -221,10 +227,12 @@ void InsulinControlSystem::updateInsulin() {
         basalRate = qMin(basalRate * 1.2, maxBasalRate);  // Increase insulin
     }
 
-    if (predictedGlu < 3.9){
+    if (currentGlucose < 3.9){
         emit logEvent("User is hypoglycemic");
-    } else if(predictedGlu >= 8.9){
+        emit logError("User is hypoglycemic");
+    } else if(currentGlucose >= 8.9){
         emit logEvent("User is hyperglycemic");
+        emit logError("User is hyperglycemic");
     }
 
     emit addPointy(timeStep,currentGlucose);
@@ -259,10 +267,12 @@ void InsulinControlSystem::depleteCartridge(double amount) {
     // Check for low insulin warning threshold (30 units)
     if (cartLevel == 30.0) {
         emit logEvent("WARNING: Insulin level low (30 units).");
+        emit logError("WARNING: Insulin level low (30 units).");
     }
     
     if (cartLevel == 0) {
         emit logEvent("Cartridge is empty.");
+        emit logError("Cartridge is empty.");
     }
 }
 
