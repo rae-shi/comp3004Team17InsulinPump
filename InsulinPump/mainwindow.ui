@@ -112,19 +112,12 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="occlusion">
-        <property name="text">
-         <string>Cause Occlusion</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
     <widget class="QWidget" name="layoutWidget_8">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>10</x>
        <y>30</y>
        <width>721</width>
        <height>31</height>
@@ -141,7 +134,14 @@
       <item>
        <widget class="QPushButton" name="disconnectButton">
         <property name="text">
-         <string>Disconnect</string>
+         <string>Disconnect Device</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="occlusion">
+        <property name="text">
+         <string>Cause Occlusion</string>
         </property>
        </widget>
       </item>
@@ -551,7 +551,7 @@
       <string>Warning Messages</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>

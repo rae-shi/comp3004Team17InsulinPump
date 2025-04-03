@@ -25,6 +25,7 @@ private slots:
     void onChargeClicked();
     void onPauseInClicked();
     void onDisconnectClicked();
+    void onOcclusionClicked();
     void onSubmitProfileClicked();
     void onEditProfileClicked();
     void onBatteryDepleted(); // New slot for battery depletion
@@ -40,7 +41,6 @@ private slots:
     void decrementBattery();
     void decrementCartridge();
     void checkHistory();
-    void clickOcclusion();
 
 signals:
     void profileUpdated(double basalRate, double correctionFactor, int carbRatio, double targetGlucose);

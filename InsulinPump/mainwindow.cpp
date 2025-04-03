@@ -60,7 +60,7 @@ void MainWindow::connectAllSlots(){
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::IOBChanged, this, &MainWindow::updateIOB);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::cartChanged, this, &MainWindow::updateCart);
     connect(ui->pauseIns, &QPushButton::clicked, this, &MainWindow::onPauseInClicked);
-    connect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::clickOcclusion);
+    connect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::onOcclusionClicked);
 
     connect(simulationTimer, &QTimer::timeout, device, &Device::runDevice);
     connect(device->findChild<InsulinControlSystem*>(), &InsulinControlSystem::addPointy, this, &MainWindow::addPoint);
@@ -85,7 +85,7 @@ void MainWindow::disconnectAllSlots(){
     // For battery and cartridge depletion (click functionality)
     disconnect(ui->depleteBatteryButton, &QPushButton::clicked, this, &MainWindow::onDepleteBatteryClicked);
     disconnect(ui->depleteCartridgeButton, &QPushButton::clicked, this, &MainWindow::onDepleteCartridgeClicked);
-    disconnect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::clickOcclusion);
+    disconnect(ui->occlusion, &QPushButton::clicked, this, &MainWindow::onOcclusionClicked);
 
     disconnect(device, &Device::batteryLevelChanged, this, &MainWindow::updateBattery);
     disconnect(device, &Device::logEvent, this, &MainWindow::appendLog);
@@ -104,6 +104,7 @@ void MainWindow::enableAllInput(){
     //buttons
     ui->chargeButton->setEnabled(true);
     ui->disconnectButton->setEnabled(true);
+    ui->occlusion->setEnabled(true);
     ui->startButton->setEnabled(true);
     ui->editProfileButton->setEnabled(true);
     ui->submitProfileButton->setEnabled(true);
@@ -132,6 +133,7 @@ void MainWindow::disableAllInput(){
     //buttons
     ui->chargeButton->setEnabled(false);
     ui->disconnectButton->setEnabled(false);
+    ui->occlusion->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->editProfileButton->setEnabled(false);
     ui->submitProfileButton->setEnabled(false);
@@ -200,10 +202,49 @@ void MainWindow::onChargeClicked(){
 }
 
 void MainWindow::onDisconnectClicked(){
-    appendLog(QString("------------------"));
-    appendLog("!! Device Disconnected from Person !!\nPlease reconnect and power the system back on.");
-    appendErrorLog("!! Device Disconnected from Person !!\nPlease reconnect and power the system back on.");
-    onStartClicked();
+    if (ui->disconnectButton->text() == "Disconnect Device"){
+        simulationTimer->stop();
+        device->stopDevice();
+        appendLog("Power off.");
+        disableAllInput();
+        ui->disconnectButton->setEnabled(true);
+        ui->disconnectButton->setText("Reconnect Device");
+        appendErrorLog("Device disconnected, reconnect device to user.");
+        appendLog("Device disconnected, reconnect device to user.");
+    } else if (ui->disconnectButton->text() == "Reconnect Device"){
+        device->startDevice();
+        simulationTimer->start(1000); // 1 second = 1 time step
+        appendLog("Power on.");
+        enableAllInput();
+        ui->disconnectButton->setText("Disconnect Device");
+        appendErrorLog("Device reconnected to user.");
+        appendLog("Device reconnected to user.");
+
+    }
+
+}
+
+
+void MainWindow::onOcclusionClicked(){
+    if (ui->occlusion->text() == "Cause Occlusion"){
+        simulationTimer->stop();
+        device->stopDevice();
+        appendLog("Power off.");
+        disableAllInput();
+        ui->occlusion->setEnabled(true);
+        ui->occlusion->setText("Resolve Occlusion");
+        appendErrorLog("Occlusion occured, check infusion site for blockages.");
+        appendLog("Occlusion occured, check infusion site for blockages.");
+    } else if (ui->occlusion->text() == "Resolve Occlusion"){
+        device->startDevice();
+        simulationTimer->start(1000); // 1 second = 1 time step
+        appendLog("Power on.");
+        enableAllInput();
+        ui->occlusion->setText("Cause Occlusion");
+        appendErrorLog("Occlusion resolved, infusion site has no blockages.");
+        appendLog("Occlusion resolved, infusion site has no blockages.");
+
+    }
 }
 
 void MainWindow::onSubmitProfileClicked(){
@@ -496,30 +537,3 @@ void MainWindow::checkHistory(){
     }
 
 }
-
-
-
-
-void MainWindow::clickOcclusion(){
-    if (ui->occlusion->text() == "Cause Occlusion"){
-        simulationTimer->stop();
-        device->stopDevice();
-        appendLog("Power off.");
-        disableAllInput();
-        ui->occlusion->setText("Resolve Occlusion");
-        appendErrorLog("Occlusion occured, check infusion site for blockages.");
-        appendLog("Occlusion occured, check infusion site for blockages.");
-    } else if (ui->occlusion->text() == "Resolve Occlusion"){
-        device->startDevice();
-        simulationTimer->start(1000); // 1 second = 1 time step
-        appendLog("Power on.");
-        enableAllInput();
-        ui->occlusion->setText("Cause Occlusion");
-        appendErrorLog("Occlusion resolved, infusion site has no blockages.");
-        appendLog("Occlusion resolved, infusion site has no blockages.");
-
-    }
-}
-
-
-
