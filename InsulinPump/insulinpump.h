@@ -66,7 +66,9 @@ public:
     double getTargetGlucose() const;
     void setTargetGlucose(double level);
     void setCurrentGlucose(double level);
-    void simulateBolus(double injectInsulin);
+    void calculateBolus(double carbInput, double glucoseInput, double bolusDurationHour, double bolusDurationMin);
+    void simulateBolus(double bolus);
+    void scheduleExtendedBolus(double bolusPerHour, int hours);
     double getInsulinOnBoard() const;
     void setTimeStep(int ts);
     void refillCartridge();

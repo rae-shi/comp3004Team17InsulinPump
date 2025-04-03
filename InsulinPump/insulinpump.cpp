@@ -1,4 +1,5 @@
 #include "insulinpump.h"
+#include <QTimer>
 
 // -------------------- Device Class --------------------
 Device::Device(QObject *parent)
@@ -245,14 +246,63 @@ void InsulinControlSystem::updateInsulin() {
                   .arg(basalEffect).arg(currentGlucose).arg(predictedGlu));
 }
 
+void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput, double bolusDurationHour, double bolusDurationMin) {
+    setCurrentGlucose(glucoseInput);
+
+    double bolusDuration = bolusDurationHour + (bolusDurationMin / 60.0);
+
+    // Bolus Calculation Logic
+    double carbBolus = carbInput / carbRatio;
+    double correctionBolus = glucoseInput > targetGlucose ? (glucoseInput - targetGlucose) / correctionFactor: 0;
+    double totalBolus = carbBolus + correctionBolus;
+    double finalBolus = totalBolus > insulinOnBoard ? totalBolus - insulinOnBoard : 0;
+
+    // will move this to a pop-up window later
+    emit logEvent(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, total: %5, IOB:%6 | finalBolus:%7")
+                  .arg(carbInput).arg(carbRatio).arg(glucoseInput).arg(targetGlucose).arg(totalBolus)
+                  .arg(insulinOnBoard).arg(finalBolus).arg(correctionFactor));
+
+    // Immediate and Extended Bolus (60% Immediate, 40% Extended over 3 hours)
+    double immediateFraction = 0.6;
+    double immediateBolus = immediateFraction * finalBolus;
+    double extendedBolus = (1 - immediateFraction) * finalBolus;
+    double bolusPerHour = extendedBolus / bolusDuration;
+
+    simulateBolus(immediateBolus);
+    scheduleExtendedBolus(bolusPerHour, bolusDuration);
+
+    emit logEvent(QString("Immediate Bolus: %1 units | Extended: %2 units over 3 hrs")
+                  .arg(immediateBolus, 0, 'f', 2)
+                  .arg(extendedBolus, 0, 'f', 2));
+
+}
+
 void InsulinControlSystem::simulateBolus(double bolus) {
     insulinOnBoard += bolus;
     currentGlucose -= bolus * 0.3;
+    cartLevel -= bolus;
 
     emit glucoseChanged(currentGlucose);
-    cartLevel -= bolus;
     emit cartChanged(cartLevel);
     emit logEvent(QString("Bolus injected: %1 | Glucose: %2").arg(bolus).arg(currentGlucose));
+}
+
+void InsulinControlSystem::scheduleExtendedBolus(double bolusPerHour, int hours) {
+    QTimer* timer = new QTimer(this);
+    int* deliveryCount = new int(0);  // use heap to persist in lambda
+
+    connect(timer, &QTimer::timeout, this, [=]() mutable {
+        if (*deliveryCount >= hours) {
+            timer->stop();
+            timer->deleteLater();
+            delete deliveryCount;
+        } else {
+            simulateBolus(bolusPerHour);
+            (*deliveryCount)++;
+        }
+    });
+
+    timer->start(3600000); // every 1 hour
 }
 
 void InsulinControlSystem::refillCartridge() {

@@ -344,66 +344,12 @@ void MainWindow::onBatteryDepleted() {
 void MainWindow::onCalculateBolus() {
     double carbInput = ui->carbsInputSpinBox->value();
     double glucoseInput = ui->glucoseInputSpinBox->value();
-    InsulinControlSystem *ics = device->findChild<InsulinControlSystem*>();
-    if (ics) {
-        ics->setCurrentGlucose(glucoseInput);
-        appendLog(QString("Glucose set to: %1 mmol/L").arg(glucoseInput, 0, 'f', 1));
-    } else {
-        appendLog("Error: InsulinControlSystem not found.");
-        appendErrorLog("Error: InsulinControlSystem not found.");
-    }
 
     int bolusDurationHour = ui->extendedDurationHourSpinBox->value();
     int bolusDurationMin = ui->extendedDurationMinSpinBox->value();
 
-    // Parameters
-    double ICR = device->findChild<InsulinControlSystem*>()->getCarbRatio();
-    double CF = device->findChild<InsulinControlSystem*>()->getCorrectionFactor();
-    double targetBG = device->findChild<InsulinControlSystem*>()->getTargetGlucose();
-    double IOB = device->findChild<InsulinControlSystem*>()->getInsulinOnBoard();
-    double bolusDuration = bolusDurationHour + (bolusDurationMin / 60.0);
+    device->findChild<InsulinControlSystem*>()->calculateBolus(carbInput, glucoseInput, bolusDurationHour, bolusDurationMin);
 
-    // Bolus Calculation Logic
-    double carbBolus = carbInput / ICR;
-    double correctionBolus = glucoseInput > targetBG ? (glucoseInput - targetBG) / CF : 0;
-    double totalBolus = carbBolus + correctionBolus;
-    double finalBolus = totalBolus - IOB;
-    appendLog(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, total: %5, iob:%6 | finalBolus:%7")
-                  .arg(carbInput).arg(ICR).arg(glucoseInput).arg(targetBG).arg(totalBolus)
-                  .arg(IOB).arg(finalBolus).arg(CF));
-
-    // Immediate and Extended Bolus (60% Immediate, 40% Extended over 3 hours)
-    double immediateFraction = 0.6;
-    double immediateBolus = immediateFraction * finalBolus;
-    double extendedBolus = (1 - immediateFraction) * finalBolus;
-    double bolusPerHour = extendedBolus / bolusDuration;
-
-    // Update UI
-    //ui->totalBolusLabel->setText(QString::number(finalBolus, 'f', 2) + " units");
-    //ui->immediateBolusLabel->setText(QString::number(immediateBolus, 'f', 2) + " units now");
-    //ui->extendedBolusLabel->setText(QString::number(bolusPerHour, 'f', 2) + " u/hr for 3 hrs");
-
-    // Deliver Immediate Bolus
-    device->findChild<InsulinControlSystem*>()->simulateBolus(immediateBolus);
-
-    // Schedule Extended Bolus
-    QTimer *extendedBolusTimer = new QTimer(this);
-    int deliveryCount = 0;
-    connect(extendedBolusTimer, &QTimer::timeout, [=, &deliveryCount]() mutable {
-        if (deliveryCount >= bolusDuration) {
-            extendedBolusTimer->stop();
-            extendedBolusTimer->deleteLater();
-        } else {
-            device->findChild<InsulinControlSystem*>()->simulateBolus(bolusPerHour);
-            deliveryCount++;
-        }
-    });
-
-    extendedBolusTimer->start(3600000); // every hour
-
-    appendLog(QString("Immediate Bolus: %1 units | Extended: %2 units over 3 hrs")
-                  .arg(immediateBolus, 0, 'f', 2)
-                  .arg(extendedBolus, 0, 'f', 2));
 }
 
 void MainWindow::onRefillCartridgeClicked() {
