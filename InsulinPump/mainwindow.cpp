@@ -359,16 +359,14 @@ void MainWindow::onRefillCartridgeClicked() {
 
 void MainWindow::onDepleteBatteryClicked() {
     // Call the existing decrement function directly
-    decrementBattery();
     appendLog("Battery depleted.");
     appendErrorLog("Battery depleted.");
+    decrementBattery();
 }
 
 void MainWindow::onDepleteCartridgeClicked() {
     // Call the existing decrement function directly
     decrementCartridge();
-    appendLog("Insulin cartridge depleted.");
-    appendErrorLog("Insulin cartridge depleted.");
 }
 
 void MainWindow::decrementBattery() {
