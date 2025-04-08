@@ -82,9 +82,8 @@ void Device::depleteBattery() {
 void Device::setBatteryLevel(int level) {
     batteryLevel = qBound(0, level, 100);
     if (batteryLevel == 10) {
-        emit logEvent("Insulin cartridge depleted.\nWARNING: Battery level low (10%).");
-        emit logError("Insulin cartridge depleted.\nWARNING: Battery level low (10%).");
-
+        emit logEvent("WARNING: Battery level low (10%).");
+        emit logError("WARNING: Battery level low (10%).");
     }
     emit batteryLevelChanged(batteryLevel);
 }
