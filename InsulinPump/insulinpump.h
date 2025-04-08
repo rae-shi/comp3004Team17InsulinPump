@@ -68,8 +68,8 @@ public:
     void setTargetGlucose(double level);
     void setCurrentGlucose(double level);
     void calculateBolus(double carbInput, double glucoseInput, double bolusDurationHour, double bolusDurationMin);
-    void simulateBolus(double bolus);
-    void scheduleExtendedBolus(double bolusPerHour, int hours);
+    void simulateBolus(double bolus, double onlyCorrection);
+    void scheduleExtendedBolus(double bolusPerHour, double correctionPerHour, int hours);
     void setTimeStep(int ts);
     void refillCartridge();
     void depleteCartridge(double amount);

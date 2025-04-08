@@ -207,8 +207,9 @@ void InsulinPumpTest::testInsulinBolus() {
     
     // Test bolus injection
     double bolusAmount = 2.0;
+    double bolusCorrection = 1.0;
     try {
-        ics.simulateBolus(bolusAmount);
+        ics.simulateBolus(bolusAmount, bolusCorrection);
         qDebug() << "Bolus injection can be simulated";
     } catch (...) {
         qDebug() << "FAIL: Exception when simulating bolus";
@@ -258,7 +259,7 @@ void InsulinPumpTest::testInsulinOnBoard() {
     QVERIFY2(initialIobCorrect, "Initial insulin on board should be zero");
     
     // Add insulin via bolus
-    ics.simulateBolus(3.0);
+    ics.simulateBolus(3.0, 1.0);
     bool iobIncreased = ics.getInsulinOnBoard() > 0;
     if (iobIncreased) {
         qDebug() << "Insulin on board increases after bolus";

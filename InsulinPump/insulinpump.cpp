@@ -259,11 +259,12 @@ void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput,
     double correctionBolus = glucoseInput > targetGlucose ? (glucoseInput - targetGlucose) / correctionFactor: 0;
     double totalBolus = carbBolus + correctionBolus;
     double finalBolus = totalBolus > insulinOnBoard ? totalBolus - insulinOnBoard : 0;
+    double correctionPortion = correctionBolus > insulinOnBoard ? correctionBolus - insulinOnBoard : 0;
 
-    // inject
-    emit logEvent(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, total: %5, IOB:%6 | finalBolus:%7")
-                  .arg(carbInput).arg(carbRatio).arg(glucoseInput).arg(targetGlucose).arg(totalBolus)
-                  .arg(insulinOnBoard).arg(finalBolus).arg(correctionFactor));
+    emit logEvent(QString("Carb Value: %1, Carb Ratio: %2, Glucose Input: %3, TargetBGL %4, Correction Factor: %5, IOB: %6 | "
+                          "Total Bolus: %7, Final Bolus: %8, Correction Portion: %9")
+                          .arg(carbInput).arg(carbRatio).arg(glucoseInput).arg(targetGlucose).arg(correctionFactor)
+                          .arg(insulinOnBoard).arg(totalBolus).arg(finalBolus).arg(correctionPortion));
 
     // Immediate and Extended Bolus (60% Immediate, 40% Extended over duration)
     double immediateFraction = 0.6;
@@ -271,8 +272,12 @@ void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput,
     double extendedBolus = (1 - immediateFraction) * finalBolus;
     double bolusPerHour = extendedBolus / bolusDuration;
 
-    simulateBolus(immediateBolus);
-    scheduleExtendedBolus(bolusPerHour, bolusDuration);
+    // Only apply correction bolus on glucose
+    double immediateCorrection = 0.6 * correctionPortion;
+    double correctionPerHour = (correctionPortion - immediateCorrection) / bolusDuration;
+
+    simulateBolus(immediateBolus, immediateCorrection);
+    scheduleExtendedBolus(bolusPerHour, correctionPerHour, bolusDuration);
 
     emit logEvent(QString("Immediate Bolus: %1 units | Extended: %2 units over 3 hrs")
                   .arg(immediateBolus, 0, 'f', 2)
@@ -280,29 +285,36 @@ void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput,
 
 }
 
-void InsulinControlSystem::simulateBolus(double bolus) {
-    //
-    double bolusEffect = bolus * 0.1;
+void InsulinControlSystem::simulateBolus(double bolus, double correctionOnly) {
+    // Simulate bolus effect
     insulinOnBoard += bolus;
-    currentGlucose -= bolus * 0.3;
-    cartLevel -= bolus;
+
+    double glucoseDrop = correctionOnly * correctionFactor;
+    // Apply only the correction effect on glucose
+    currentGlucose = currentGlucose > glucoseDrop
+                         ? currentGlucose - glucoseDrop
+                         : 0;
+    depleteCartridge(bolus);
 
     emit glucoseChanged(currentGlucose);
-    emit cartChanged(cartLevel);
     emit logEvent(QString("Bolus injected: %1 | Glucose: %2").arg(bolus).arg(currentGlucose));
 }
 
-void InsulinControlSystem::scheduleExtendedBolus(double bolusPerHour, int hours) {
+void InsulinControlSystem::scheduleExtendedBolus(double bolusPerHour, double correctioPerHour, int hours) {
     QTimer* timer = new QTimer(this);
     int* deliveryCount = new int(0);  // use heap to persist in lambda
 
     connect(timer, &QTimer::timeout, this, [=]() mutable {
+        if(currentState  == Pause) {
+            return;
+        }
+
         if (*deliveryCount >= hours) {
             timer->stop();
             timer->deleteLater();
             delete deliveryCount;
         } else {
-            simulateBolus(bolusPerHour);
+            simulateBolus(bolusPerHour, correctioPerHour);
             (*deliveryCount)++;
         }
     });
