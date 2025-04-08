@@ -22,7 +22,6 @@ public:
     void depleteBattery();
     void refillCartridge();
     void setBatteryLevel(int level);
-
     int getBatteryLevel() const;
 
 public slots:
@@ -55,26 +54,25 @@ public:
     explicit InsulinControlSystem(QObject *parent = nullptr);
 
     void updateInsulin(); // runs every time step
+    double getCarbRatio() const;
+    double getCorrectionFactor() const;
+    double getTargetGlucose() const;
+    double getInsulinOnBoard() const;
+    double getCartridgeLevel() const;
+
     void setState(State state);
-    //void setMode(Mode mode);
     void setBasalRate(double rate);
     void setProfileBasalRate(double rate);
-    double getCorrectionFactor() const;
-    void setCorrectionFactor(double factor);
-    double getCarbRatio() const;
     void setCarbRatio(int carb);
-    double getTargetGlucose() const;
+    void setCorrectionFactor(double factor);
     void setTargetGlucose(double level);
     void setCurrentGlucose(double level);
     void calculateBolus(double carbInput, double glucoseInput, double bolusDurationHour, double bolusDurationMin);
     void simulateBolus(double bolus);
     void scheduleExtendedBolus(double bolusPerHour, int hours);
-    double getInsulinOnBoard() const;
     void setTimeStep(int ts);
     void refillCartridge();
     void depleteCartridge(double amount);
-    double getCartridgeLevel() const;
-
 
 signals:
     void insulinDelivered(double amount);
@@ -95,7 +93,6 @@ private:
     double currentGlucose;
     double insulinOnBoard;
     double cartLevel;
-    //Mode currentMode;
     State currentState;
 
 };

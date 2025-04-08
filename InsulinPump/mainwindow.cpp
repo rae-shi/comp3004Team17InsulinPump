@@ -415,10 +415,6 @@ void MainWindow::decrementCartridge() {
     }
 }
 
-
-
-
-
 void MainWindow::initializeGraph(){
     // Set graph up
     series = new QLineSeries();

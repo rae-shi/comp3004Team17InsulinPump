@@ -175,7 +175,7 @@ void InsulinControlSystem::updateInsulin() {
         setBasalRate(profileBasalRate);
     }
 
-    // Adjust active basal rate based  on profile basal rate
+    // Adjust active basal rate based on profile basal rate
     if (currentState != Pause){
         // Simulate effect of basal insulin delivery
         // Calculate basal effect as 1/10th basal rate for simultation reasons
@@ -184,6 +184,7 @@ void InsulinControlSystem::updateInsulin() {
 
         currentGlucose -= 0.1 * basalRate;
     } else if (currentState == Pause){
+        // Increase the blood glucose since insulin stops
         currentGlucose += 0.05;
     }
 
@@ -204,6 +205,7 @@ void InsulinControlSystem::updateInsulin() {
     // calculate hours remaining for IOB
     double remainingTimeHours;
 
+    // remaining time for consuming insulin on board
     if (insulinOnBoard > 0.01){
         double remainingTimeMinutes = log(100 / insulinOnBoard) / log(1.02); // Using a decay formula
         remainingTimeHours= remainingTimeMinutes / 60.0;  // Convert minutes to hours
@@ -222,7 +224,7 @@ void InsulinControlSystem::updateInsulin() {
     if (predictedGlu <= targetGlucose-0.1) {
         basalRate = 0.0;  // Suspend insulin if glucose is too low
     } else if (predictedGlu <= targetGlucose+0.03) {
-        basalRate = qMax(basalRate * 0.5, 0.1);  // Reduce insulin
+        basalRate = qMax(basalRate * 0.5, 0.1);  // Reduce basal insulin when predict glucose is in the range of target glucose
     } else if (predictedGlu >= targetGlucose+0.5) {
         double maxBasalRate = 2.0;
         basalRate = qMin(basalRate * 1.2, maxBasalRate);  // Increase insulin
@@ -247,6 +249,7 @@ void InsulinControlSystem::updateInsulin() {
 }
 
 void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput, double bolusDurationHour, double bolusDurationMin) {
+    // Overwrite blood glucose using user input
     setCurrentGlucose(glucoseInput);
 
     double bolusDuration = bolusDurationHour + (bolusDurationMin / 60.0);
@@ -257,12 +260,12 @@ void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput,
     double totalBolus = carbBolus + correctionBolus;
     double finalBolus = totalBolus > insulinOnBoard ? totalBolus - insulinOnBoard : 0;
 
-    // will move this to a pop-up window later
+    // inject
     emit logEvent(QString("carb value: %1, ICR: %2, glucose input: %3, targetBGL %4, CF: %8, total: %5, IOB:%6 | finalBolus:%7")
                   .arg(carbInput).arg(carbRatio).arg(glucoseInput).arg(targetGlucose).arg(totalBolus)
                   .arg(insulinOnBoard).arg(finalBolus).arg(correctionFactor));
 
-    // Immediate and Extended Bolus (60% Immediate, 40% Extended over 3 hours)
+    // Immediate and Extended Bolus (60% Immediate, 40% Extended over duration)
     double immediateFraction = 0.6;
     double immediateBolus = immediateFraction * finalBolus;
     double extendedBolus = (1 - immediateFraction) * finalBolus;
@@ -278,6 +281,8 @@ void InsulinControlSystem::calculateBolus(double carbInput, double glucoseInput,
 }
 
 void InsulinControlSystem::simulateBolus(double bolus) {
+    //
+    double bolusEffect = bolus * 0.1;
     insulinOnBoard += bolus;
     currentGlucose -= bolus * 0.3;
     cartLevel -= bolus;

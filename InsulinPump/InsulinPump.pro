@@ -21,4 +21,5 @@ FORMS += \
     mainwindow.ui
 
 DISTFILES += \
+    .gitignore \
     .gitignore

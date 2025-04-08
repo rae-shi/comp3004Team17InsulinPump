@@ -1,0 +1,9 @@
+# macOS system files
+.DS_Store
+
+# Qt build files
+*.pro.user
+*.qmake.stash
+
+# Ignore build directory
+build/
