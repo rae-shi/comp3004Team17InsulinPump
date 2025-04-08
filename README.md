@@ -1,6 +1,6 @@
 # COMP 3004 Team 17 Final Project - Insulin Pump
 
-### GitHub Repository: https://github.com/rae-shi/comp3004Team17InsulinPump/tree/main](https://github.com/rae-shi/comp3004Team17InsulinPump
+### GitHub Repository: https://github.com/rae-shi/comp3004Team17InsulinPump
 
 ### Team Members:
 
